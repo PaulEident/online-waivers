@@ -48,7 +48,59 @@ export async function submitWaiver(data: WaiverInput) {
     },
   });
 
+  // Subscribe to Mailchimp if opted in
+  if (data.mailchimpOptIn) {
+    try {
+      await subscribeToMailchimp(data.email, data.firstName, data.lastName);
+    } catch (error) {
+      // Log but don't block the waiver submission
+      console.error("Mailchimp subscribe error:", error);
+    }
+  }
+
   redirect(`/thank-you?name=${encodeURIComponent(data.firstName)}&count=${data.familyMembers.length}`);
+}
+
+async function subscribeToMailchimp(email: string, firstName: string, lastName: string) {
+  const apiKey = process.env.MAILCHIMP_API_KEY;
+  const audienceId = process.env.MAILCHIMP_AUDIENCE_ID;
+
+  if (!apiKey || !audienceId) {
+    console.warn("Mailchimp API key or Audience ID not configured");
+    return;
+  }
+
+  // Extract data center from API key (e.g., "us22" from "...key-us22")
+  const dataCenter = apiKey.split("-").pop();
+
+  const response = await fetch(
+    `https://${dataCenter}.api.mailchimp.com/3.0/lists/${audienceId}/members`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `apikey ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email_address: email,
+        status: "subscribed",
+        merge_fields: {
+          FNAME: firstName,
+          LNAME: lastName,
+        },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    // Don't throw for "already subscribed" (Member Exists)
+    if (errorData.title === "Member Exists") {
+      console.log(`${email} is already subscribed to Mailchimp`);
+      return;
+    }
+    throw new Error(`Mailchimp API error: ${errorData.title} - ${errorData.detail}`);
+  }
 }
 
 export async function adminLogin(password: string) {
