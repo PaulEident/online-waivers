@@ -1,7 +1,7 @@
 {
-  "name": "Iron County Trail Club - Candlelight Snowshoe Waiver",
-  "short_name": "ICTC Waiver",
-  "description": "Sign the liability waiver for the Iron County Trail Club Candlelight Snowshoe event.",
+  "name": "Iron County Trail Club - Event Waivers",
+  "short_name": "ICTC Waivers",
+  "description": "Sign liability waivers for Iron County Trail Club events.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f3f4f6",

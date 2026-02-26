@@ -1,4 +1,8 @@
-export default function WaiverText() {
+interface WaiverTextProps {
+  eventName?: string;
+}
+
+export default function WaiverText({ eventName = "the Event" }: WaiverTextProps) {
   return (
     <div className="prose prose-sm max-w-none">
       <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -6,11 +10,11 @@ export default function WaiverText() {
       </h3>
 
       <p className="text-sm text-gray-700 leading-relaxed">
-        <strong>EVENT:</strong> Candlelight Snowshoe, organized by the Iron County Trail Club
+        <strong>EVENT:</strong> {eventName}, organized by the Iron County Trail Club
       </p>
 
       <p className="text-sm text-gray-700 leading-relaxed">
-        In consideration of being permitted to participate in the Candlelight Snowshoe event
+        In consideration of being permitted to participate in the {eventName} event
         and any related activities (hereinafter referred to as &quot;the Activity&quot;) organized by the
         Iron County Trail Club, its officers, directors, volunteers, agents, representatives,
         sponsors, property owners, and property managers

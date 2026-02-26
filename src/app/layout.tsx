@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Iron County Trail Club - Candlelight Snowshoe Waiver",
-  description: "Sign the liability waiver for the Iron County Trail Club Candlelight Snowshoe event.",
+  title: "Iron County Trail Club - Event Waivers",
+  description: "Sign liability waivers for Iron County Trail Club events.",
   manifest: "/manifest.json",
   themeColor: "#166534",
   appleWebApp: {

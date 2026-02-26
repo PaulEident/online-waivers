@@ -4,6 +4,10 @@ import { prisma } from "./prisma";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 interface FamilyMemberInput {
   firstName: string;
   lastName: string;
@@ -22,10 +26,119 @@ interface WaiverInput {
   signatureData: string;
   mailchimpOptIn: boolean;
   familyMembers: FamilyMemberInput[];
+  eventId: string;
+  eventSlug: string;
 }
 
+interface EventInput {
+  name: string;
+  slug: string;
+  description?: string;
+  date: string;
+  location?: string;
+  active: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Helper: start of today (midnight) for date comparisons
+// ---------------------------------------------------------------------------
+
+function startOfToday() {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now;
+}
+
+// ---------------------------------------------------------------------------
+// Event actions
+// ---------------------------------------------------------------------------
+
+export async function getUpcomingEvents() {
+  return prisma.event.findMany({
+    where: { active: true, date: { gte: startOfToday() } },
+    orderBy: { date: "asc" },
+  });
+}
+
+export async function getAdminUpcomingEvents() {
+  return prisma.event.findMany({
+    where: { date: { gte: startOfToday() } },
+    orderBy: { date: "asc" },
+    include: { _count: { select: { waivers: true } } },
+  });
+}
+
+export async function getAdminPastEvents() {
+  return prisma.event.findMany({
+    where: { date: { lt: startOfToday() } },
+    orderBy: { date: "desc" },
+    include: { _count: { select: { waivers: true } } },
+  });
+}
+
+export async function getAllEvents() {
+  return prisma.event.findMany({
+    orderBy: { date: "desc" },
+    include: { _count: { select: { waivers: true } } },
+  });
+}
+
+export async function getEventBySlug(slug: string) {
+  return prisma.event.findUnique({ where: { slug } });
+}
+
+export async function getEvent(id: string) {
+  return prisma.event.findUnique({
+    where: { id },
+    include: { _count: { select: { waivers: true } } },
+  });
+}
+
+export async function createEvent(data: EventInput) {
+  return prisma.event.create({
+    data: {
+      name: data.name,
+      slug: data.slug,
+      description: data.description || null,
+      date: new Date(data.date),
+      location: data.location || null,
+      active: data.active,
+    },
+  });
+}
+
+export async function updateEvent(id: string, data: Partial<EventInput>) {
+  return prisma.event.update({
+    where: { id },
+    data: {
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.slug !== undefined && { slug: data.slug }),
+      ...(data.description !== undefined && {
+        description: data.description || null,
+      }),
+      ...(data.date !== undefined && { date: new Date(data.date) }),
+      ...(data.location !== undefined && { location: data.location || null }),
+      ...(data.active !== undefined && { active: data.active }),
+    },
+  });
+}
+
+export async function deleteEvent(id: string) {
+  const count = await prisma.waiver.count({ where: { eventId: id } });
+  if (count > 0) {
+    throw new Error(
+      "Cannot delete event with existing waivers. Deactivate it instead."
+    );
+  }
+  return prisma.event.delete({ where: { id } });
+}
+
+// ---------------------------------------------------------------------------
+// Waiver actions
+// ---------------------------------------------------------------------------
+
 export async function submitWaiver(data: WaiverInput) {
-  const waiver = await prisma.waiver.create({
+  await prisma.waiver.create({
     data: {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -38,6 +151,7 @@ export async function submitWaiver(data: WaiverInput) {
       signatureData: data.signatureData,
       agreedToWaiver: true,
       mailchimpOptIn: data.mailchimpOptIn,
+      eventId: data.eventId,
       familyMembers: {
         create: data.familyMembers.map((fm) => ({
           firstName: fm.firstName,
@@ -58,10 +172,16 @@ export async function submitWaiver(data: WaiverInput) {
     }
   }
 
-  redirect(`/thank-you?name=${encodeURIComponent(data.firstName)}&count=${data.familyMembers.length}`);
+  redirect(
+    `/thank-you?name=${encodeURIComponent(data.firstName)}&count=${data.familyMembers.length}&event=${encodeURIComponent(data.eventSlug)}`
+  );
 }
 
-async function subscribeToMailchimp(email: string, firstName: string, lastName: string) {
+async function subscribeToMailchimp(
+  email: string,
+  firstName: string,
+  lastName: string
+) {
   const apiKey = process.env.MAILCHIMP_API_KEY;
   const audienceId = process.env.MAILCHIMP_AUDIENCE_ID;
 
@@ -99,9 +219,15 @@ async function subscribeToMailchimp(email: string, firstName: string, lastName: 
       console.log(`${email} is already subscribed to Mailchimp`);
       return;
     }
-    throw new Error(`Mailchimp API error: ${errorData.title} - ${errorData.detail}`);
+    throw new Error(
+      `Mailchimp API error: ${errorData.title} - ${errorData.detail}`
+    );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Auth actions
+// ---------------------------------------------------------------------------
 
 export async function adminLogin(password: string) {
   if (password === process.env.ADMIN_PASSWORD) {
@@ -129,6 +255,10 @@ export async function isAdminAuthenticated() {
   return cookieStore.get("admin_session")?.value === "authenticated";
 }
 
+// ---------------------------------------------------------------------------
+// Admin waiver actions
+// ---------------------------------------------------------------------------
+
 export async function toggleCheckIn(waiverId: string) {
   const waiver = await prisma.waiver.findUnique({ where: { id: waiverId } });
   if (!waiver) return;
@@ -139,20 +269,25 @@ export async function toggleCheckIn(waiverId: string) {
   });
 }
 
-export async function getWaivers(search?: string) {
-  const where = search
-    ? {
-        OR: [
-          { firstName: { contains: search } },
-          { lastName: { contains: search } },
-          { email: { contains: search } },
-        ],
-      }
-    : {};
+export async function getWaivers(search?: string, eventId?: string) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any = {};
+
+  if (eventId) {
+    where.eventId = eventId;
+  }
+
+  if (search) {
+    where.OR = [
+      { firstName: { contains: search, mode: "insensitive" } },
+      { lastName: { contains: search, mode: "insensitive" } },
+      { email: { contains: search, mode: "insensitive" } },
+    ];
+  }
 
   return prisma.waiver.findMany({
     where,
-    include: { familyMembers: true },
+    include: { familyMembers: true, event: true },
     orderBy: { createdAt: "desc" },
   });
 }
@@ -160,6 +295,6 @@ export async function getWaivers(search?: string) {
 export async function getWaiver(id: string) {
   return prisma.waiver.findUnique({
     where: { id },
-    include: { familyMembers: true },
+    include: { familyMembers: true, event: true },
   });
 }

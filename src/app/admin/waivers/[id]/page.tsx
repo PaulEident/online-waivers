@@ -91,6 +91,12 @@ export default async function WaiverDetailPage({
               </dd>
             </div>
             <div>
+              <dt className="text-xs text-gray-500">Event</dt>
+              <dd className="text-sm font-medium text-gray-900">
+                {waiver.event?.name || "No event"}
+              </dd>
+            </div>
+            <div>
               <dt className="text-xs text-gray-500">Mailchimp Opt-in</dt>
               <dd className="text-sm font-medium text-gray-900">
                 {waiver.mailchimpOptIn ? (

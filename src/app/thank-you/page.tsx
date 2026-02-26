@@ -1,9 +1,21 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { getEventBySlug } from "@/lib/actions";
 
-function ThankYouContent({ searchParams }: { searchParams: { name?: string; count?: string } }) {
+async function ThankYouContent({
+  searchParams,
+}: {
+  searchParams: { name?: string; count?: string; event?: string };
+}) {
   const name = searchParams.name || "Participant";
   const familyCount = parseInt(searchParams.count || "0");
+  const eventSlug = searchParams.event;
+
+  let eventName: string | null = null;
+  if (eventSlug) {
+    const event = await getEventBySlug(eventSlug);
+    if (event) eventName = event.name;
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
@@ -45,7 +57,7 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
 
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-6">
             <p className="text-sm text-green-800 font-medium">
-              Enjoy the Candlelight Snowshoe!
+              {eventName ? `Enjoy the ${eventName}!` : "Enjoy the event!"}
             </p>
             <p className="text-xs text-green-600 mt-1">
               Please check in with event staff when you arrive.
@@ -53,7 +65,7 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
           </div>
 
           <Link
-            href="/"
+            href={eventSlug ? `/waiver/${eventSlug}` : "/"}
             className="inline-block mt-8 text-sm text-green-700 hover:text-green-800 underline"
           >
             Submit another waiver
@@ -61,7 +73,8 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
         </div>
 
         <p className="text-xs text-gray-400 mt-6">
-          Iron County Trail Club &middot; Building single track trails for quiet sports
+          Iron County Trail Club &middot; Building single track trails for quiet
+          sports
         </p>
       </div>
     </main>
@@ -71,11 +84,17 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
 export default async function ThankYouPage({
   searchParams,
 }: {
-  searchParams: Promise<{ name?: string; count?: string }>;
+  searchParams: Promise<{ name?: string; count?: string; event?: string }>;
 }) {
   const params = await searchParams;
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
       <ThankYouContent searchParams={params} />
     </Suspense>
   );

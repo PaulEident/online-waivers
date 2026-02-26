@@ -8,6 +8,18 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+model Event {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  name        String
+  slug        String   @unique
+  description String?
+  date        DateTime
+  location    String?
+  active      Boolean  @default(true)
+  waivers     Waiver[]
+}
+
 model Waiver {
   id                    String         @id @default(cuid())
   createdAt             DateTime       @default(now())
@@ -23,6 +35,8 @@ model Waiver {
   agreedToWaiver        Boolean        @default(false)
   mailchimpOptIn        Boolean        @default(false)
   checkedIn             Boolean        @default(false)
+  eventId               String?
+  event                 Event?         @relation(fields: [eventId], references: [id])
   familyMembers         FamilyMember[]
 }
 

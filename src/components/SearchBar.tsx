@@ -5,24 +5,29 @@ import { useState } from "react";
 
 interface SearchBarProps {
   defaultValue: string;
+  basePath?: string;
 }
 
-export default function SearchBar({ defaultValue }: SearchBarProps) {
+export default function SearchBar({
+  defaultValue,
+  basePath = "/admin/dashboard",
+}: SearchBarProps) {
   const [search, setSearch] = useState(defaultValue);
   const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const separator = basePath.includes("?") ? "&" : "?";
     if (search.trim()) {
-      router.push(`/admin/dashboard?search=${encodeURIComponent(search.trim())}`);
+      router.push(`${basePath}${separator}search=${encodeURIComponent(search.trim())}`);
     } else {
-      router.push("/admin/dashboard");
+      router.push(basePath);
     }
   };
 
   const handleClear = () => {
     setSearch("");
-    router.push("/admin/dashboard");
+    router.push(basePath);
   };
 
   return (

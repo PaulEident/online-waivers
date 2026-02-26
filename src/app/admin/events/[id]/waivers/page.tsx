@@ -1,37 +1,28 @@
-import { redirect } from "next/navigation";
-import {
-  isAdminAuthenticated,
-  getWaivers,
-  getAllEvents,
-  adminLogout,
-} from "@/lib/actions";
+import { redirect, notFound } from "next/navigation";
+import { isAdminAuthenticated, getWaivers, getEvent } from "@/lib/actions";
 import Link from "next/link";
 import CheckInButton from "@/components/CheckInButton";
 import SearchBar from "@/components/SearchBar";
-import EventFilter from "@/components/EventFilter";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminDashboardPage({
+export default async function EventWaiversPage({
+  params,
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string; eventId?: string }>;
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ search?: string }>;
 }) {
   const authenticated = await isAdminAuthenticated();
   if (!authenticated) redirect("/admin");
 
-  const params = await searchParams;
-  const search = params.search || "";
-  const eventId = params.eventId || "";
+  const { id } = await params;
+  const event = await getEvent(id);
+  if (!event) notFound();
 
-  const [waivers, allEvents] = await Promise.all([
-    getWaivers(search, eventId || undefined),
-    getAllEvents(),
-  ]);
-
-  const selectedEvent = eventId
-    ? allEvents.find((e) => e.id === eventId)
-    : null;
+  const sp = await searchParams;
+  const search = sp.search || "";
+  const waivers = await getWaivers(search, event.id);
 
   const totalWaivers = waivers.length;
   const checkedInCount = waivers.filter((w) => w.checkedIn).length;
@@ -45,51 +36,45 @@ export default async function AdminDashboardPage({
       <div className="bg-green-800 text-white">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold">Waiver Admin</h1>
-            <p className="text-green-200 text-sm">
-              {selectedEvent ? selectedEvent.name : "All Events"}
-            </p>
+            <h1 className="text-xl font-bold">{event.name}</h1>
+            <p className="text-green-200 text-sm">Event Waivers</p>
           </div>
           <div className="flex gap-4 items-center">
+            <Link
+              href={`/admin/events/${event.id}`}
+              className="text-sm text-green-200 hover:text-white underline"
+            >
+              Edit Event
+            </Link>
             <Link
               href="/admin/events"
               className="text-sm text-green-200 hover:text-white underline"
             >
-              Manage Events
+              All Events
             </Link>
-            <form action={adminLogout}>
-              <button
-                type="submit"
-                className="text-sm text-green-200 hover:text-white underline"
-              >
-                Log out
-              </button>
-            </form>
           </div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Event Filter */}
-        <div className="mb-4">
-          <EventFilter
-            events={allEvents.map((e) => ({ id: e.id, name: e.name }))}
-            selectedEventId={eventId}
-          />
-        </div>
-
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-4 text-center">
-            <div className="text-3xl font-bold text-gray-900">{totalWaivers}</div>
+            <div className="text-3xl font-bold text-gray-900">
+              {totalWaivers}
+            </div>
             <div className="text-sm text-gray-500">Waivers Signed</div>
           </div>
           <div className="bg-white rounded-lg shadow p-4 text-center">
-            <div className="text-3xl font-bold text-gray-900">{totalPeople}</div>
+            <div className="text-3xl font-bold text-gray-900">
+              {totalPeople}
+            </div>
             <div className="text-sm text-gray-500">Total People</div>
           </div>
           <div className="bg-white rounded-lg shadow p-4 text-center">
-            <div className="text-3xl font-bold text-green-600">{checkedInCount}</div>
+            <div className="text-3xl font-bold text-green-600">
+              {checkedInCount}
+            </div>
             <div className="text-sm text-gray-500">Checked In</div>
           </div>
         </div>
@@ -98,11 +83,7 @@ export default async function AdminDashboardPage({
         <div className="mb-4">
           <SearchBar
             defaultValue={search}
-            basePath={
-              eventId
-                ? `/admin/dashboard?eventId=${eventId}`
-                : "/admin/dashboard"
-            }
+            basePath={`/admin/events/${event.id}/waivers`}
           />
         </div>
 
@@ -117,9 +98,6 @@ export default async function AdminDashboardPage({
                   </th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-600 hidden sm:table-cell">
                     Email
-                  </th>
-                  <th className="px-4 py-3 text-left font-semibold text-gray-600 hidden lg:table-cell">
-                    Event
                   </th>
                   <th className="px-4 py-3 text-center font-semibold text-gray-600">
                     Family
@@ -138,8 +116,13 @@ export default async function AdminDashboardPage({
               <tbody className="divide-y divide-gray-100">
                 {waivers.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                      {search ? "No waivers found matching your search." : "No waivers submitted yet."}
+                    <td
+                      colSpan={6}
+                      className="px-4 py-8 text-center text-gray-500"
+                    >
+                      {search
+                        ? "No waivers found matching your search."
+                        : "No waivers submitted yet for this event."}
                     </td>
                   </tr>
                 ) : (
@@ -155,9 +138,6 @@ export default async function AdminDashboardPage({
                       </td>
                       <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">
                         {waiver.email}
-                      </td>
-                      <td className="px-4 py-3 text-gray-600 text-xs hidden lg:table-cell">
-                        {waiver.event?.name || "—"}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {waiver.familyMembers.length > 0 ? (

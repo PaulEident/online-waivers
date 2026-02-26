@@ -6,7 +6,13 @@ import FamilyMembers, { FamilyMember } from "./FamilyMembers";
 import WaiverText from "./WaiverText";
 import { submitWaiver } from "@/lib/actions";
 
-export default function WaiverForm() {
+interface WaiverFormProps {
+  eventId: string;
+  eventSlug: string;
+  eventName: string;
+}
+
+export default function WaiverForm({ eventId, eventSlug, eventName }: WaiverFormProps) {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [signatureType, setSignatureType] = useState<"draw" | "type">("draw");
   const [signatureData, setSignatureData] = useState("");
@@ -102,6 +108,8 @@ export default function WaiverForm() {
         signatureType,
         signatureData,
         mailchimpOptIn,
+        eventId,
+        eventSlug,
         familyMembers: familyMembers.map((fm) => ({
           firstName: fm.firstName.trim(),
           lastName: fm.lastName.trim(),
@@ -252,7 +260,7 @@ export default function WaiverForm() {
           Liability Waiver
         </h2>
         <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4 bg-gray-50">
-          <WaiverText />
+          <WaiverText eventName={eventName} />
         </div>
         <div className="flex items-start gap-3">
           <input
