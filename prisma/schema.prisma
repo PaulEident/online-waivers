@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Waiver {
+  id                    String         @id @default(cuid())
+  createdAt             DateTime       @default(now())
+  firstName             String
+  lastName              String
+  email                 String
+  phone                 String?
+  dateOfBirth           String
+  emergencyContactName  String
+  emergencyContactPhone String
+  signatureType         String         // "draw" or "type"
+  signatureData         String         // base64 image or typed name
+  agreedToWaiver        Boolean        @default(false)
+  mailchimpOptIn        Boolean        @default(false)
+  checkedIn             Boolean        @default(false)
+  familyMembers         FamilyMember[]
+}
+
+model FamilyMember {
+  id        String @id @default(cuid())
+  waiverId  String
+  waiver    Waiver @relation(fields: [waiverId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  age       Int
+}
