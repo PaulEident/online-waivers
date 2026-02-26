@@ -32,6 +32,10 @@ export default function Home() {
       {/* Footer */}
       <footer className="text-center py-6 text-sm text-gray-400">
         Iron County Trail Club &middot; Building single track trails for quiet sports
+        <br />
+        <a href="/admin" className="text-gray-300 hover:text-gray-500 transition-colors">
+          Admin
+        </a>
       </footer>
     </main>
   );
