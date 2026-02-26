@@ -12,7 +12,8 @@ export default function WaiverText() {
       <p className="text-sm text-gray-700 leading-relaxed">
         In consideration of being permitted to participate in the Candlelight Snowshoe event
         and any related activities (hereinafter referred to as &quot;the Activity&quot;) organized by the
-        Iron County Trail Club, its officers, directors, volunteers, agents, and representatives
+        Iron County Trail Club, its officers, directors, volunteers, agents, representatives,
+        sponsors, property owners, and property managers
         (hereinafter collectively referred to as &quot;the Organization&quot;), I hereby freely and
         voluntarily, without duress, execute this Release and Waiver of Liability, Assumption
         of Risk, and Indemnity Agreement (hereinafter referred to as &quot;the Agreement&quot;).
