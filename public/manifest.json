@@ -1,13 +1,18 @@
 {
-  "name": "Iron County Trail Club - Candlelight Snowshoe Waiver",
-  "short_name": "ICTC Waiver",
-  "description": "Sign the liability waiver for the Iron County Trail Club Candlelight Snowshoe event.",
+  "name": "Volntir - Digital Waiver Management",
+  "short_name": "Volntir",
+  "description": "Collect digital liability waivers for your events. Multi-tenant, role-based, with check-in.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f3f4f6",
-  "theme_color": "#166534",
+  "background_color": "#ffffff",
+  "theme_color": "#FF5A1F",
   "orientation": "portrait",
   "icons": [
+    {
+      "src": "/volntir_app_icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
