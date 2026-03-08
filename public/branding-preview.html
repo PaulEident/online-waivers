@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volntir - Branding Preview</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 { font-size: 48px; margin-bottom: 40px; color: #2563eb; }
+        .section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .logo-row {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+        .logo-row.dark {
+            background: #1f2937;
+        }
+        .colors {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .color-card {
+            padding: 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+        }
+        .nav-demo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+        }
+        .nav-demo img {
+            height: 40px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            color: #666;
+            font-weight: 500;
+        }
+        .usage {
+            background: #f0f9ff;
+            border: 2px solid #2563eb;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        .usage h3 {
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .usage ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        code {
+            background: #e5e7eb;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Monaco', monospace;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Volntir Branding</h1>
+
+        <!-- Logo Variations -->
+        <div class="section">
+            <h2>Logo Variations</h2>
+            
+            <div class="logo-row">
+                <div>
+                    <h3>Primary Logo</h3>
+                    <p style="color: #666; font-size: 14px;">Full wordmark with stylized "i"</p>
+                </div>
+                <img src="logo.svg" alt="Volntir Logo" style="height: 60px;">
+            </div>
+
+            <div class="logo-row">
+                <div>
+                    <h3>Icon Only</h3>
+                    <p style="color: #666; font-size: 14px;">Square format for app icons</p>
+                </div>
+                <img src="logo-icon.svg" alt="Volntir Icon" style="height: 60px;">
+            </div>
+
+            <div class="logo-row">
+                <div>
+                    <h3>Wordmark Simple</h3>
+                    <p style="color: #666; font-size: 14px;">Clean text-only version</p>
+                </div>
+                <img src="logo-wordmark.svg" alt="Volntir Wordmark" style="height: 40px;">
+            </div>
+
+            <div class="logo-row dark">
+                <div style="color: white;">
+                    <h3>On Dark Background</h3>
+                    <p style="color: #ddd; font-size: 14px;">Logo works on dark surfaces too</p>
+                </div>
+                <img src="logo.svg" alt="Volntir Logo" style="height: 60px; filter: brightness(2);">
+            </div>
+        </div>
+
+        <!-- Colors -->
+        <div class="section">
+            <h2>Brand Colors</h2>
+            <div class="colors">
+                <div class="color-card" style="background: #2563eb;">
+                    <div style="font-size: 18px;">Primary Blue</div>
+                    <div style="opacity: 0.9;">#2563eb</div>
+                </div>
+                <div class="color-card" style="background: #fbbf24;">
+                    <div style="font-size: 18px;">Gold Accent</div>
+                    <div style="opacity: 0.9;">#fbbf24</div>
+                </div>
+                <div class="color-card" style="background: #10b981;">
+                    <div style="font-size: 18px;">Success Green</div>
+                    <div style="opacity: 0.9;">#10b981</div>
+                </div>
+                <div class="color-card" style="background: #666;">
+                    <div style="font-size: 18px;">Text Gray</div>
+                    <div style="opacity: 0.9;">#666666</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- In Context -->
+        <div class="section">
+            <h2>Navigation Bar Example</h2>
+            <div class="nav-demo">
+                <img src="logo.svg" alt="Volntir" style="height: 35px;">
+                <div class="nav-links">
+                    <span>Find Events</span>
+                    <span>My Profile</span>
+                    <span>Sign In</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Guidelines -->
+        <div class="section">
+            <h2>Usage Guidelines</h2>
+            
+            <div class="usage">
+                <h3>✅ DO:</h3>
+                <ul>
+                    <li>Use <code>logo.svg</code> for main website header</li>
+                    <li>Use <code>logo-icon.svg</code> for app icons, favicons (square format)</li>
+                    <li>Use <code>logo-wordmark.svg</code> for minimal contexts</li>
+                    <li>Maintain clear space around logo (minimum 20px)</li>
+                    <li>Use on white or dark backgrounds</li>
+                </ul>
+            </div>
+
+            <div class="usage" style="margin-top: 20px; background: #fee; border-color: #ef4444;">
+                <h3 style="color: #dc2626;">❌ DON'T:</h3>
+                <ul style="color: #666;">
+                    <li>Distort, rotate, or skew the logo</li>
+                    <li>Change colors (except inverting for dark backgrounds)</li>
+                    <li>Add effects (shadows, gradients, etc.)</li>
+                    <li>Place on busy backgrounds</li>
+                    <li>Make smaller than 24px height</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- File Paths -->
+        <div class="section">
+            <h2>File Paths</h2>
+            <p style="margin-bottom: 15px; color: #666;">All logo files are in <code>public/</code> directory:</p>
+            <ul style="margin-left: 20px; line-height: 2;">
+                <li><code>/logo.svg</code> - Primary logo (200×60)</li>
+                <li><code>/logo-icon.svg</code> - Icon only (60×60)</li>
+                <li><code>/logo-wordmark.svg</code> - Simple wordmark (180×40)</li>
+                <li><code>/favicon.svg</code> - Favicon (32×32)</li>
+            </ul>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="section" style="background: #f0f9ff; border-color: #2563eb;">
+            <h2 style="color: #2563eb;">📋 Next Steps</h2>
+            <ol style="margin-left: 20px; line-height: 2; color: #333;">
+                <li>Use these SVGs in the MVP (they scale perfectly)</li>
+                <li>Update <code>src/app/layout.tsx</code> to use <code>/logo.svg</code> in nav</li>
+                <li>Add <code>/favicon.svg</code> to HTML head</li>
+                <li>After MVP launch, consider hiring a designer to refine</li>
+                <li>Create PNG exports for social media (1200×630)</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

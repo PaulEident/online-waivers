@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Events - Volntir</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: white;
+            border-bottom: 2px solid #ddd;
+            padding: 15px 20px;
+        }
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .search-header {
+            margin-bottom: 30px;
+        }
+        .search-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .search-btn {
+            padding: 12px 32px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .filter-btn.active {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+        .content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+        }
+        .sidebar {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            height: fit-content;
+        }
+        .sidebar h3 {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .filter-group {
+            margin-bottom: 20px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+        .results {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .event-card {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 25px;
+            border-radius: 8px;
+            display: flex;
+            gap: 20px;
+        }
+        .event-image {
+            width: 200px;
+            height: 150px;
+            background: #e5e7eb;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 48px;
+        }
+        .event-content {
+            flex: 1;
+        }
+        .event-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .event-title {
+            font-size: 22px;
+            margin-bottom: 8px;
+            color: #111;
+        }
+        .event-title a {
+            color: #111;
+            text-decoration: none;
+        }
+        .event-title a:hover {
+            color: #2563eb;
+        }
+        .event-org {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .event-desc {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .event-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .tag {
+            padding: 4px 12px;
+            background: #f0f9ff;
+            border: 1px solid #2563eb;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #2563eb;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                order: 2;
+            }
+            .event-card {
+                flex-direction: column;
+            }
+            .event-image {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="nav">
+            <div class="logo">Volntir</div>
+            <div class="nav-links">
+                <a href="search.html">Find Events</a>
+                <a href="profile.html">My Profile</a>
+                <a href="#">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <div class="search-header">
+            <h1>Find Volunteer Opportunities</h1>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search by keyword, location, or cause...">
+                <button class="search-btn">Search</button>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active">All</button>
+                <button class="filter-btn">This Week</button>
+                <button class="filter-btn">One-time</button>
+                <button class="filter-btn">Recurring</button>
+                <button class="filter-btn">Virtual</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Sidebar Filters -->
+            <aside class="sidebar">
+                <h3>Filters</h3>
+                
+                <div class="filter-group">
+                    <label>Location</label>
+                    <input type="text" placeholder="Zip code or city">
+                    <input type="range" min="5" max="100" value="25" style="margin-top: 10px;">
+                    <small style="color: #666;">Within 25 miles</small>
+                </div>
+
+                <div class="filter-group">
+                    <label>Cause</label>
+                    <select>
+                        <option>All causes</option>
+                        <option>Environment</option>
+                        <option>Animals</option>
+                        <option>Community</option>
+                        <option>Education</option>
+                        <option>Health</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Date Range</label>
+                    <input type="date">
+                    <input type="date" style="margin-top: 8px;">
+                </div>
+
+                <div class="filter-group">
+                    <label>Requirements</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox"> CPR Certified</label>
+                        <label><input type="checkbox"> First Aid</label>
+                        <label><input type="checkbox"> Background Check</label>
+                        <label><input type="checkbox"> 18+ only</label>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Results -->
+            <div class="results">
+                <!-- Event Card 1 -->
+                <div class="event-card">
+                    <div class="event-image">🌲</div>
+                    <div class="event-content">
+                        <div class="event-meta">
+                            <span>📅 Sat, Mar 15 • 9:00 AM</span>
+                            <span>📍 Iron River, MI</span>
+                        </div>
+                        <h2 class="event-title">
+                            <a href="event.html">Spring Trail Cleanup</a>
+                        </h2>
+                        <div class="event-org">Iron County Trail Club</div>
+                        <p class="event-desc">
+                            Help us clear winter debris from 5 miles of trails. Bring work gloves and water. 
+                            Lunch provided. All ages welcome, minors must be accompanied by adult.
+                        </p>
+                        <div class="event-tags">
+                            <span class="tag">Environment</span>
+                            <span class="tag">Outdoors</span>
+                            <span class="tag">3-4 hours</span>
+                            <span class="tag">⭐ 4.8</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 2 -->
+                <div class="event-card">
+                    <div class="event-image">🐕</div>
+                    <div class="event-content">
+                        <div class="event-meta">
+                            <span>📅 Sun, Mar 16 • 2:00 PM</span>
+                            <span>📍 Marquette, MI</span>
+                        </div>
+                        <h2 class="event-title">
+                            <a href="event.html">Animal Shelter - Dog Walking</a>
+                        </h2>
+                        <div class="event-org">UP Animal Welfare Shelter</div>
+                        <p class="event-desc">
+                            Spend an afternoon walking shelter dogs. Help socialize our furry friends while they 
+                            wait for their forever homes. Training provided.
+                        </p>
+                        <div class="event-tags">
+                            <span class="tag">Animals</span>
+                            <span class="tag">Indoor/Outdoor</span>
+                            <span class="tag">2 hours</span>
+                            <span class="tag">Recurring</span>
+                            <span class="tag">⭐ 5.0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 3 -->
+                <div class="event-card">
+                    <div class="event-image">🎿</div>
+                    <div class="event-content">
+                        <div class="event-meta">
+                            <span>📅 Sat, Mar 22 • 8:00 AM</span>
+                            <span>📍 Iron River, MI</span>
+                        </div>
+                        <h2 class="event-title">
+                            <a href="event.html">Ski Patrol Training Day</a>
+                        </h2>
+                        <div class="event-org">Ski Brule</div>
+                        <p class="event-desc">
+                            Join us for ski patrol training and certification renewal. CPR and First Aid required.
+                            Full-day commitment. Lift tickets provided.
+                        </p>
+                        <div class="event-tags">
+                            <span class="tag">Health & Safety</span>
+                            <span class="tag">Outdoors</span>
+                            <span class="tag">Full day</span>
+                            <span class="tag">CPR Required</span>
+                            <span class="tag">⭐ 4.9</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

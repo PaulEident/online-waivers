@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity Feed - Volntir</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: white;
+            border-bottom: 2px solid #ddd;
+            padding: 15px 20px;
+        }
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+        }
+        .sidebar-left, .sidebar-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .card h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .stat-mini {
+            text-align: center;
+            padding: 15px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+        }
+        .stat-mini-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .stat-mini-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .upcoming-event {
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        .event-small-date {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .event-small-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .friend-item:hover {
+            background: #f9fafb;
+        }
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            background: #e5e7eb;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .friend-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .feed-item {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 25px;
+            border-radius: 8px;
+        }
+        .feed-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .feed-avatar {
+            width: 50px;
+            height: 50px;
+            background: #e5e7eb;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .feed-user-info {
+            flex: 1;
+        }
+        .feed-user-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .feed-time {
+            font-size: 13px;
+            color: #666;
+        }
+        .feed-content {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .feed-event-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 12px;
+        }
+        .feed-event-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .feed-event-org {
+            font-size: 14px;
+            color: #666;
+        }
+        .feed-actions {
+            display: flex;
+            gap: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .feed-action {
+            color: #666;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .feed-action:hover {
+            color: #2563eb;
+        }
+        .achievement-earned {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar-right {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="nav">
+            <div class="logo">Volntir</div>
+            <div class="nav-links">
+                <a href="search.html">Find Events</a>
+                <a href="profile.html">My Profile</a>
+                <a href="dashboard.html">Feed</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <a href="index.html" class="back-link">← Back</a>
+        
+        <div class="content-grid">
+            <!-- Left Sidebar -->
+            <div class="sidebar-left">
+                <div class="card">
+                    <h3>Your Stats</h3>
+                    <div class="quick-stats">
+                        <div class="stat-mini">
+                            <div class="stat-mini-number">87</div>
+                            <div class="stat-mini-label">Hours</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="stat-mini-number">15</div>
+                            <div class="stat-mini-label">Events</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="stat-mini-number">6</div>
+                            <div class="stat-mini-label">Orgs</div>
+                        </div>
+                        <div class="stat-mini">
+                            <div class="stat-mini-number">4.9</div>
+                            <div class="stat-mini-label">Rating</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Upcoming Events</h3>
+                    <div class="upcoming-event">
+                        <div class="event-small-date">Sat, Mar 15 • 9:00 AM</div>
+                        <div class="event-small-name">Spring Trail Cleanup</div>
+                    </div>
+                    <div class="upcoming-event">
+                        <div class="event-small-date">Sun, Mar 16 • 2:00 PM</div>
+                        <div class="event-small-name">Dog Walking</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Feed -->
+            <div class="feed">
+                <!-- Feed Item 1 -->
+                <div class="feed-item">
+                    <div class="feed-header">
+                        <div class="feed-avatar">👤</div>
+                        <div class="feed-user-info">
+                            <div class="feed-user-name">Tom Johnson</div>
+                            <div class="feed-time">2 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="feed-content">
+                        Just signed up for <strong>Spring Trail Cleanup</strong>! Who else is going? 🌲
+                    </div>
+                    <div class="feed-event-card">
+                        <div class="feed-event-name">Spring Trail Cleanup</div>
+                        <div class="feed-event-org">Iron County Trail Club • Sat, Mar 15</div>
+                    </div>
+                    <div class="feed-actions">
+                        <span class="feed-action">👍 Like</span>
+                        <span class="feed-action">💬 Comment</span>
+                        <span class="feed-action">📤 Share</span>
+                    </div>
+                </div>
+
+                <!-- Feed Item 2 -->
+                <div class="feed-item">
+                    <div class="feed-header">
+                        <div class="feed-avatar">👤</div>
+                        <div class="feed-user-info">
+                            <div class="feed-user-name">Sarah Miller</div>
+                            <div class="feed-time">5 hours ago</div>
+                        </div>
+                    </div>
+                    <div class="feed-content">
+                        Earned my <strong>50 Hours</strong> badge! 🎉 So grateful for all the amazing organizations 
+                        I've volunteered with this year.
+                    </div>
+                    <div class="achievement-earned">
+                        <span style="font-size: 24px;">⭐</span>
+                        <div>
+                            <div style="font-weight: 600;">50 Hours</div>
+                            <div style="font-size: 12px; color: #666;">Achievement Unlocked</div>
+                        </div>
+                    </div>
+                    <div class="feed-actions">
+                        <span class="feed-action">👍 12 Likes</span>
+                        <span class="feed-action">💬 3 Comments</span>
+                        <span class="feed-action">📤 Share</span>
+                    </div>
+                </div>
+
+                <!-- Feed Item 3 -->
+                <div class="feed-item">
+                    <div class="feed-header">
+                        <div class="feed-avatar">👤</div>
+                        <div class="feed-user-info">
+                            <div class="feed-user-name">Mike Anderson</div>
+                            <div class="feed-time">Yesterday</div>
+                        </div>
+                    </div>
+                    <div class="feed-content">
+                        Amazing day at the <strong>Candlelight Snowshoe</strong> event! Met so many great people 
+                        and the trails were beautiful. Already signed up for the next one! ❄️
+                    </div>
+                    <div class="feed-event-card">
+                        <div class="feed-event-name">Candlelight Snowshoe</div>
+                        <div class="feed-event-org">Iron County Trail Club • 3 hours volunteered</div>
+                    </div>
+                    <div class="feed-actions">
+                        <span class="feed-action">👍 8 Likes</span>
+                        <span class="feed-action">💬 2 Comments</span>
+                        <span class="feed-action">📤 Share</span>
+                    </div>
+                </div>
+
+                <!-- Feed Item 4 -->
+                <div class="feed-item">
+                    <div class="feed-header">
+                        <div class="feed-avatar">🏢</div>
+                        <div class="feed-user-info">
+                            <div class="feed-user-name">Iron County Trail Club</div>
+                            <div class="feed-time">2 days ago</div>
+                        </div>
+                    </div>
+                    <div class="feed-content">
+                        Big thank you to all 30 volunteers who showed up for our <strong>Winter Trail Maintenance</strong>! 
+                        We cleared 5 miles of trail and everyone worked so hard. See you at the Spring Cleanup! 🙏
+                    </div>
+                    <div class="feed-actions">
+                        <span class="feed-action">👍 24 Likes</span>
+                        <span class="feed-action">💬 7 Comments</span>
+                        <span class="feed-action">📤 Share</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="sidebar-right">
+                <div class="card">
+                    <h3>Friends (12)</h3>
+                    <div class="friend-item">
+                        <div class="friend-avatar">👤</div>
+                        <div class="friend-name">Tom Johnson</div>
+                    </div>
+                    <div class="friend-item">
+                        <div class="friend-avatar">👤</div>
+                        <div class="friend-name">Sarah Miller</div>
+                    </div>
+                    <div class="friend-item">
+                        <div class="friend-avatar">👤</div>
+                        <div class="friend-name">Mike Anderson</div>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <a href="#" style="color: #2563eb; text-decoration: none; font-size: 14px;">View all</a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Suggested Events</h3>
+                    <div class="upcoming-event">
+                        <div class="event-small-date">Mar 22 • 8:00 AM</div>
+                        <div class="event-small-name">Ski Patrol Training</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">Ski Brule</div>
+                    </div>
+                    <div class="upcoming-event">
+                        <div class="event-small-date">Mar 25 • 10:00 AM</div>
+                        <div class="event-small-name">Food Bank Sort</div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">UP Food Bank</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

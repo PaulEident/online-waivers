@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Hour Certificate - Volntir</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: white;
+            border-bottom: 2px solid #ddd;
+            padding: 15px 20px;
+        }
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .page-header p {
+            color: #666;
+        }
+        .certificate-preview {
+            background: white;
+            border: 3px solid #2563eb;
+            padding: 50px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .cert-logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .cert-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2563eb;
+        }
+        .cert-subtitle {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .cert-name {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .cert-content {
+            line-height: 2;
+            margin-bottom: 30px;
+            color: #555;
+        }
+        .cert-hours {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2563eb;
+            margin: 30px 0;
+        }
+        .cert-hours-label {
+            font-size: 18px;
+            color: #666;
+        }
+        .cert-details {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            color: #666;
+            font-weight: 600;
+        }
+        .cert-seal {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            background: #fef3c7;
+            border: 3px solid #fbbf24;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 20px 0;
+        }
+        .cert-id {
+            font-size: 12px;
+            color: #999;
+            font-family: 'Courier New', monospace;
+            margin-top: 20px;
+        }
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+        .pricing-card {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .price {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2563eb;
+            margin: 20px 0;
+        }
+        .price-description {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .btn-download {
+            width: 100%;
+            padding: 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .benefit-list {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .benefit-item {
+            display: flex;
+            align-items: start;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="nav">
+            <div class="logo">Volntir</div>
+            <div class="nav-links">
+                <a href="search.html">Find Events</a>
+                <a href="profile.html">My Profile</a>
+                <a href="#">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <a href="profile.html" class="back-link">← Back to Profile</a>
+        
+        <div class="page-header">
+            <h1>Official Volunteer Hour Certificate</h1>
+            <p>Download a verified certificate for college applications, graduation, or employment</p>
+        </div>
+
+        <!-- Certificate Preview -->
+        <div class="certificate-preview">
+            <div class="cert-logo">🏆</div>
+            <div class="cert-title">CERTIFICATE OF VOLUNTEER SERVICE</div>
+            <div class="cert-subtitle">This certifies that</div>
+            
+            <div class="cert-name">Jane Smith</div>
+            
+            <div class="cert-content">
+                has completed verified volunteer service through Volntir
+            </div>
+            
+            <div class="cert-hours">87</div>
+            <div class="cert-hours-label">Total Volunteer Hours</div>
+            
+            <div class="cert-details">
+                <div class="detail-row">
+                    <span class="detail-label">Period:</span>
+                    <span>January 2026 - March 2026</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Events Attended:</span>
+                    <span>15 events</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Organizations:</span>
+                    <span>6 organizations</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Issued:</span>
+                    <span>March 7, 2026</span>
+                </div>
+            </div>
+
+            <div class="cert-seal">✓</div>
+            
+            <div style="margin-top: 20px; font-size: 14px; color: #666;">
+                Verify this certificate at:<br>
+                <strong>volntir.com/verify</strong>
+            </div>
+            
+            <div class="qr-code">[QR Code]</div>
+            
+            <div class="cert-id">
+                Certificate ID: VH-2026-87A3B2C1
+            </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="pricing-card">
+            <h2>Download Your Official Certificate</h2>
+            <div class="price">$5</div>
+            <div class="price-description">
+                One-time purchase. Instant PDF download. Unlimited views forever.
+            </div>
+
+            <div class="benefit-list">
+                <div class="benefit-item">
+                    <span>✓</span>
+                    <span>Tamper-proof verification with unique certificate ID</span>
+                </div>
+                <div class="benefit-item">
+                    <span>✓</span>
+                    <span>QR code for instant verification</span>
+                </div>
+                <div class="benefit-item">
+                    <span>✓</span>
+                    <span>Professional PDF suitable for college applications</span>
+                </div>
+                <div class="benefit-item">
+                    <span>✓</span>
+                    <span>Includes complete event history breakdown</span>
+                </div>
+                <div class="benefit-item">
+                    <span>✓</span>
+                    <span>Accepted by schools, employers, and organizations</span>
+                </div>
+            </div>
+
+            <button class="btn-download">Purchase & Download</button>
+            
+            <div style="font-size: 14px; color: #666;">
+                Secure payment via Stripe. Apple Pay & Google Pay accepted.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

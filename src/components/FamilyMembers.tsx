@@ -38,7 +38,7 @@ export default function FamilyMembers({ members, onChange }: FamilyMembersProps)
         <button
           type="button"
           onClick={addMember}
-          className="inline-flex items-center px-3 py-1.5 bg-green-700 text-white text-sm font-medium rounded-md hover:bg-green-800 transition-colors"
+          className="inline-flex items-center px-3 py-1.5 bg-brand text-white text-sm font-medium rounded-md hover:bg-brand-hover transition-colors"
         >
           <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -80,7 +80,7 @@ export default function FamilyMembers({ members, onChange }: FamilyMembersProps)
                 value={member.firstName}
                 onChange={(e) => updateMember(index, "firstName", e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-brand focus:border-brand"
                 placeholder="First name"
               />
             </div>
@@ -93,7 +93,7 @@ export default function FamilyMembers({ members, onChange }: FamilyMembersProps)
                 value={member.lastName}
                 onChange={(e) => updateMember(index, "lastName", e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-brand focus:border-brand"
                 placeholder="Last name"
               />
             </div>
@@ -108,7 +108,7 @@ export default function FamilyMembers({ members, onChange }: FamilyMembersProps)
                 required
                 min="0"
                 max="17"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-brand focus:border-brand"
                 placeholder="Age"
               />
             </div>

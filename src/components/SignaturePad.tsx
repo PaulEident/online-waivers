@@ -57,7 +57,7 @@ export default function SignaturePad({ onSignatureChange }: SignaturePadProps) {
           onClick={() => handleModeSwitch("draw")}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             mode === "draw"
-              ? "bg-green-700 text-white"
+              ? "bg-brand text-white"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >
@@ -68,7 +68,7 @@ export default function SignaturePad({ onSignatureChange }: SignaturePadProps) {
           onClick={() => handleModeSwitch("type")}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             mode === "type"
-              ? "bg-green-700 text-white"
+              ? "bg-brand text-white"
               : "bg-gray-200 text-gray-700 hover:bg-gray-300"
           }`}
         >

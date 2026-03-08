@@ -5,6 +5,14 @@
   --color-foreground: #171717;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Volntir brand colors */
+  --color-brand: #FF5A1F;
+  --color-brand-hover: #E04D15;
+  --color-brand-light: #FFF7ED;
+  --color-brand-dark: #1F2937;
+  --color-accent: #22C55E;
+  --color-accent-hover: #16A34A;
 }
 
 body {

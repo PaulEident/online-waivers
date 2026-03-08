@@ -8,29 +8,201 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
+// ──────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────
+
+enum UserRole {
+  SUPER_ADMIN
+  ORG_OWNER
+  ORG_ADMIN
+  EVENT_MANAGER
+  USER
+}
+
+enum OrgRole {
+  OWNER
+  ADMIN
+  EVENT_MANAGER
+}
+
+// ──────────────────────────────────────────
+// Auth (NextAuth.js v5)
+// ──────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(USER)
+
+  accounts       Account[]
+  sessions       Session[]
+  orgMembers     OrgMember[]
+  eventManagers  EventManager[]
+  waivers        Waiver[]
+  checkIns       CheckIn[]
+  checkedInBy    CheckIn[]      @relation("CheckedInBy")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ──────────────────────────────────────────
+// Multi-tenant: Organizations & Events
+// ──────────────────────────────────────────
+
+model Organization {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  waiverTemplate String   @db.Text
+
+  members OrgMember[]
+  events  Event[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrgMember {
+  id     String  @id @default(cuid())
+  userId String
+  orgId  String
+  role   OrgRole
+
+  user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  org  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, orgId])
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  orgId       String
+  name        String
+  slug        String
+  shortCode   String    @unique
+  date        DateTime?
+  location    String?
+  description String?   @db.Text
+
+  org      Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  waivers  Waiver[]
+  checkIns CheckIn[]
+  managers EventManager[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([orgId, slug])
+}
+
+model EventManager {
+  id      String @id @default(cuid())
+  eventId String
+  userId  String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  assignedAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+}
+
+// ──────────────────────────────────────────
+// Waivers & Check-ins
+// ──────────────────────────────────────────
+
 model Waiver {
-  id                    String         @id @default(cuid())
-  createdAt             DateTime       @default(now())
+  id      String @id @default(cuid())
+  userId  String
+  eventId String
+
+  // Participant info
   firstName             String
   lastName              String
   email                 String
   phone                 String?
-  dateOfBirth           String
+  dateOfBirth           DateTime
   emergencyContactName  String
   emergencyContactPhone String
-  signatureType         String         // "draw" or "type"
-  signatureData         String         // base64 image or typed name
-  agreedToWaiver        Boolean        @default(false)
-  mailchimpOptIn        Boolean        @default(false)
-  checkedIn             Boolean        @default(false)
-  familyMembers         FamilyMember[]
+
+  // Family members (children under 18) stored as JSON array
+  // Each element: { firstName, lastName, dateOfBirth }
+  familyMembers Json?
+
+  // Signature
+  signatureData String @db.Text
+  signatureType String
+  signedAt      DateTime @default(now())
+  ipAddress     String?
+  userAgent     String?
+
+  // Marketing opt-in
+  mailchimpOptIn Boolean @default(false)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, eventId])
 }
 
-model FamilyMember {
-  id        String @id @default(cuid())
-  waiverId  String
-  waiver    Waiver @relation(fields: [waiverId], references: [id], onDelete: Cascade)
-  firstName String
-  lastName  String
-  age       Int
+model CheckIn {
+  id          String @id @default(cuid())
+  userId      String
+  eventId     String
+  checkedInBy String
+
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event   Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  checker User  @relation("CheckedInBy", fields: [checkedInBy], references: [id])
+
+  checkedInAt DateTime @default(now())
+
+  @@unique([userId, eventId])
 }

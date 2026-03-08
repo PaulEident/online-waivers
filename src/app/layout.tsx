@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
+import SessionProvider from "@/components/SessionProvider";
+import NavBar from "@/components/NavBar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,18 +16,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Iron County Trail Club - Candlelight Snowshoe Waiver",
-  description: "Sign the liability waiver for the Iron County Trail Club Candlelight Snowshoe event.",
+  title: "Volntir - Digital Waiver Management",
+  description: "Collect digital liability waivers for your events. Multi-tenant, role-based, with check-in.",
   manifest: "/manifest.json",
-  themeColor: "#166534",
+  themeColor: "#FF5A1F",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "ICTC Waiver",
+    title: "Volntir",
   },
   icons: {
-    icon: "/icons/icon-192x192.png",
-    apple: "/icons/apple-touch-icon.png",
+    icon: "/volntir_app_icon.svg",
+    apple: "/volntir_app_icon.svg",
   },
 };
 
@@ -39,8 +41,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
-        <Script
+        <SessionProvider>
+          <NavBar />
+          {children}
+        </SessionProvider>
+        {/* Service Worker disabled - enable after fixing SSL certificate trust */}
+        {/* <Script
           id="sw-register"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
@@ -50,7 +56,7 @@ export default function RootLayout({
               }
             `,
           }}
-        />
+        /> */}
       </body>
     </html>
   );

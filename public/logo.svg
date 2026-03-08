@@ -1,0 +1,29 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Volntir wordmark with stylized "i" -->
+  <g id="logo">
+    <!-- V -->
+    <path d="M10 15L20 45L30 15" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- o -->
+    <circle cx="45" cy="30" r="10" stroke="#2563eb" stroke-width="4" fill="none"/>
+    
+    <!-- l -->
+    <line x1="65" y1="15" x2="65" y2="45" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- n -->
+    <path d="M75 45V25C75 20 78 17 82 17C86 17 89 20 89 25V45" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    
+    <!-- t -->
+    <line x1="99" y1="20" x2="99" y2="45" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+    <line x1="94" y1="25" x2="104" y2="25" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- i (stylized as person) -->
+    <circle cx="115" cy="20" r="3" fill="#fbbf24"/>
+    <line x1="115" y1="26" x2="115" y2="38" stroke="#2563eb" stroke-width="4" stroke-linecap="round"/>
+    <path d="M115 38L110 45M115 38L120 45" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+    <path d="M115 30L110 34M115 30L120 34" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- r -->
+    <path d="M130 45V25M130 25C130 20 133 17 137 17" stroke="#2563eb" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

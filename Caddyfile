@@ -1,0 +1,29 @@
+cp30.pauleident.com {
+    reverse_proxy localhost:3000
+    
+    # Cloudflare Origin Certificate
+    tls /etc/caddy/certs/cp30.crt /etc/caddy/certs/cp30.key
+    
+    # Enable gzip compression
+    encode gzip
+    
+    # Access logs
+    log {
+        output file /var/log/caddy/cp30-access.log
+    }
+}
+
+openclaw.pauleident.com {
+    reverse_proxy localhost:18789
+    
+    # Cloudflare Origin Certificate (same wildcard cert)
+    tls /etc/caddy/certs/cp30.crt /etc/caddy/certs/cp30.key
+    
+    # Enable gzip compression
+    encode gzip
+    
+    # Access logs
+    log {
+        output file /var/log/caddy/openclaw-access.log
+    }
+}

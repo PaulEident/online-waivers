@@ -1,21 +1,26 @@
 "use client";
 
-import { toggleCheckIn } from "@/lib/actions";
+import { checkInUser, undoCheckIn } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface CheckInButtonProps {
-  waiverId: string;
+  eventId: string;
+  userId: string;
   checkedIn: boolean;
 }
 
-export default function CheckInButton({ waiverId, checkedIn }: CheckInButtonProps) {
+export default function CheckInButton({ eventId, userId, checkedIn }: CheckInButtonProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const handleToggle = async () => {
     setLoading(true);
-    await toggleCheckIn(waiverId);
+    if (checkedIn) {
+      await undoCheckIn(eventId, userId);
+    } else {
+      await checkInUser(eventId, userId);
+    }
     router.refresh();
     setLoading(false);
   };

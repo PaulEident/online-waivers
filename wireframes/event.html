@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Trail Cleanup - Volntir</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: white;
+            border-bottom: 2px solid #ddd;
+            padding: 15px 20px;
+        }
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-links a {
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .event-hero {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .event-image-large {
+            width: 100%;
+            height: 300px;
+            background: #e5e7eb;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            margin-bottom: 30px;
+        }
+        .event-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .meta-item {
+            font-size: 14px;
+            color: #666;
+        }
+        .event-title {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .event-org {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .event-org a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .event-tags {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .tag {
+            padding: 6px 14px;
+            background: #f0f9ff;
+            border: 1px solid #2563eb;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #2563eb;
+        }
+        .btn-register {
+            width: 100%;
+            padding: 16px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .event-content {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .section p {
+            line-height: 1.8;
+            color: #555;
+        }
+        .info-box {
+            background: #f0f9ff;
+            border: 2px solid #2563eb;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .info-box h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .info-box ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        .info-box li {
+            padding: 5px 0;
+            color: #555;
+        }
+        .requirement-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        .volunteers-section {
+            background: white;
+            border: 2px solid #ddd;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        .volunteer-list {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .volunteer-avatar {
+            width: 50px;
+            height: 50px;
+            background: #e5e7eb;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="nav">
+            <div class="logo">Volntir</div>
+            <div class="nav-links">
+                <a href="search.html">Find Events</a>
+                <a href="profile.html">My Profile</a>
+                <a href="#">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <a href="search.html" class="back-link">← Back to Search</a>
+        
+        <div class="event-hero">
+            <div class="event-image-large">🌲</div>
+            
+            <div class="event-meta">
+                <span class="meta-item">📅 Saturday, March 15, 2026</span>
+                <span class="meta-item">🕘 9:00 AM - 1:00 PM</span>
+                <span class="meta-item">📍 Iron River, MI 49935</span>
+            </div>
+            
+            <h1 class="event-title">Spring Trail Cleanup</h1>
+            <div class="event-org">
+                Hosted by <a href="#">Iron County Trail Club</a>
+            </div>
+            
+            <div class="rating">⭐ 4.8 (42 reviews)</div>
+            
+            <div class="event-tags">
+                <span class="tag">Environment</span>
+                <span class="tag">Outdoors</span>
+                <span class="tag">3-4 hours</span>
+                <span class="tag">Family Friendly</span>
+            </div>
+            
+            <button class="btn-register">Register to Volunteer</button>
+        </div>
+
+        <div class="event-content">
+            <div class="section">
+                <h2>About This Event</h2>
+                <p>
+                    Join us for our annual Spring Trail Cleanup! After a long winter, our trails need some TLC. 
+                    We'll be clearing winter debris, repairing boardwalks, and marking trails for the summer season.
+                </p>
+                <p style="margin-top: 15px;">
+                    This is a great opportunity to give back to the trails you love while meeting fellow outdoor 
+                    enthusiasts. All experience levels welcome - we'll provide training and tools.
+                </p>
+            </div>
+
+            <div class="info-box">
+                <h3>What to Bring</h3>
+                <ul>
+                    <li>✓ Work gloves</li>
+                    <li>✓ Water bottle</li>
+                    <li>✓ Sturdy boots</li>
+                    <li>✓ Weather-appropriate clothing</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h3>What We Provide</h3>
+                <ul>
+                    <li>✓ Lunch (sandwiches, snacks, drinks)</li>
+                    <li>✓ Tools (rakes, shovels, pruners)</li>
+                    <li>✓ First aid supplies</li>
+                    <li>✓ Trail maps</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>Requirements</h2>
+                <p>
+                    <span class="requirement-badge">Waiver Required</span>
+                    <span class="requirement-badge">18+ or with Guardian</span>
+                </p>
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                    All volunteers must sign a liability waiver. Minors must be accompanied by a parent or legal guardian.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>Location & Parking</h2>
+                <p>
+                    Meet at the Iron County Trailhead parking lot (123 Trail Road, Iron River, MI 49935). 
+                    Free parking available. Carpooling encouraged.
+                </p>
+            </div>
+
+            <div class="section">
+                <h2>Volunteer Hours</h2>
+                <p>
+                    This event counts towards verified volunteer hours. Participants typically earn 3-4 hours 
+                    depending on shift length. Official certificate available after check-out.
+                </p>
+            </div>
+        </div>
+
+        <div class="volunteers-section">
+            <h2>23 Volunteers Registered</h2>
+            <p style="color: #666; margin-bottom: 10px;">Your friends volunteering:</p>
+            <div class="volunteer-list">
+                <div class="volunteer-avatar">👤</div>
+                <div class="volunteer-avatar">👤</div>
+                <div class="volunteer-avatar">👤</div>
+                <div style="display: flex; align-items: center; color: #666;">+20 more</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,27 +1,19 @@
 import { Suspense } from "react";
 import Link from "next/link";
 
-function ThankYouContent({ searchParams }: { searchParams: { name?: string; count?: string } }) {
+function ThankYouContent({ searchParams }: { searchParams: { name?: string; count?: string; event?: string; org?: string } }) {
   const name = searchParams.name || "Participant";
   const familyCount = parseInt(searchParams.count || "0");
+  const eventName = searchParams.event || "the event";
+  const orgName = searchParams.org;
 
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
       <div className="max-w-lg w-full text-center">
         <div className="bg-white rounded-xl shadow-lg p-8 md:p-12">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg
-              className="w-8 h-8 text-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
+            <svg className="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
 
@@ -30,7 +22,7 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
           </h1>
 
           <p className="text-gray-600 mb-2">
-            Your waiver has been successfully submitted and signed.
+            Your waiver for <strong>{eventName}</strong> has been successfully submitted and signed.
           </p>
 
           {familyCount > 0 && (
@@ -38,31 +30,30 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
               Your waiver covers you and{" "}
               <strong>
                 {familyCount} family member{familyCount > 1 ? "s" : ""}
-              </strong>
-              .
+              </strong>.
             </p>
           )}
 
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-6">
-            <p className="text-sm text-green-800 font-medium">
-              Enjoy the Candlelight Snowshoe!
+          <div className="bg-brand-light border border-orange-200 rounded-lg p-4 mt-6">
+            <p className="text-sm text-brand-dark font-medium">
+              Enjoy {eventName}!
             </p>
-            <p className="text-xs text-green-600 mt-1">
+            <p className="text-xs text-gray-600 mt-1">
               Please check in with event staff when you arrive.
             </p>
           </div>
 
           <Link
-            href="/"
-            className="inline-block mt-8 text-sm text-green-700 hover:text-green-800 underline"
+            href="/dashboard"
+            className="inline-block mt-8 text-sm text-brand hover:text-brand-hover underline"
           >
-            Submit another waiver
+            Go to your dashboard
           </Link>
         </div>
 
-        <p className="text-xs text-gray-400 mt-6">
-          Iron County Trail Club &middot; Building single track trails for quiet sports
-        </p>
+        {orgName && (
+          <p className="text-xs text-gray-400 mt-6">{orgName}</p>
+        )}
       </div>
     </main>
   );
@@ -71,7 +62,7 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
 export default async function ThankYouPage({
   searchParams,
 }: {
-  searchParams: Promise<{ name?: string; count?: string }>;
+  searchParams: Promise<{ name?: string; count?: string; event?: string; org?: string }>;
 }) {
   const params = await searchParams;
   return (
