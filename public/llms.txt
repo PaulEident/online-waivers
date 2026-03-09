@@ -1,0 +1,38 @@
+# Volntir
+
+> Free digital waiver management platform for events and organizations.
+
+Volntir is a web application that lets organizations collect digital liability waivers for their events. It is free to use — free account creation, unlimited events, and unlimited signed waivers.
+
+## Features
+
+- **Digital Waivers**: Customizable waiver templates with electronic signatures (draw or type). One waiver per participant per event.
+- **Event Management**: Create and manage events with unique short-code URLs for easy sharing.
+- **Event Check-In**: Search attendees by name, view waiver status, and check them in on arrival.
+- **Multi-Tenant**: Multiple organizations, each with their own events, members, and waiver templates.
+- **Family Waivers**: Parents or guardians can add minor children to a single waiver.
+- **Role-Based Access**: Super admins, organization owners, admins, and event managers.
+
+## Pricing
+
+Volntir is completely free:
+- Free account creation
+- Unlimited events
+- Unlimited signed waivers
+- No credit card required
+
+## Tech Stack
+
+- Next.js (React)
+- PostgreSQL
+- Prisma ORM
+- NextAuth.js (Google OAuth + email/password)
+- Tailwind CSS
+- Cloudflare Turnstile (bot protection)
+
+## Links
+
+- Website: https://volntir.com
+- Sign Up: https://volntir.com/auth/signup
+- Privacy Policy: https://volntir.com/privacy
+- Support: https://volntir.com/support

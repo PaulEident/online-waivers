@@ -4,11 +4,39 @@ import Link from "next/link";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Volntir",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  description: "Free digital waiver management platform for events and organizations. Collect electronic signatures, manage check-ins, and organize unlimited events.",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  featureList: [
+    "Digital liability waivers with electronic signatures",
+    "Event check-in management",
+    "Multi-tenant organization support",
+    "Family/minor waiver support",
+    "Unlimited events and waivers",
+    "Role-based access control",
+  ],
+};
+
 export default function Home() {
   const { data: session } = useSession();
 
   return (
     <main className="min-h-screen bg-gray-50">
+      {/* JSON-LD Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       {/* Hero */}
       <div className="relative overflow-hidden bg-brand-dark text-white">
         {/* Gradient mesh background */}
@@ -43,10 +71,26 @@ export default function Home() {
             </span>
           </h1>
 
-          <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto mb-12 leading-relaxed">
+          <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto mb-8 leading-relaxed">
             Collect digital liability waivers for your events. Manage organizations,
             check in attendees, and keep everything organized.
           </p>
+
+          {/* FREE callout */}
+          <div className="flex flex-wrap justify-center gap-3 mb-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/15 text-green-400 text-sm font-semibold border border-green-500/20">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              Free Account
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/15 text-green-400 text-sm font-semibold border border-green-500/20">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              Unlimited Events
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/15 text-green-400 text-sm font-semibold border border-green-500/20">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              Unlimited Waivers
+            </span>
+          </div>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
             {session?.user ? (
@@ -62,7 +106,7 @@ export default function Home() {
                   href="/auth/signup"
                   className="px-10 py-3.5 bg-brand hover:bg-brand-hover text-white font-bold rounded-xl shadow-lg shadow-brand/25 transition-all hover:shadow-xl hover:shadow-brand/35 hover:-translate-y-0.5 text-base"
                 >
-                  Get Started
+                  Get Started — It&apos;s Free
                 </Link>
                 <Link
                   href="#features"
@@ -102,7 +146,7 @@ export default function Home() {
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Digital Waivers</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Customizable waiver templates with electronic signatures. One waiver per user per event.
+              Customizable waiver templates with electronic signatures. Draw or type your signature on any device.
             </p>
           </div>
 
@@ -134,14 +178,98 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="text-center py-10 text-sm text-gray-400 border-t border-gray-200">
-        <div className="flex items-center justify-center gap-1.5 mb-2">
-          <Image src="/volntir-icon.png" alt="" width={18} height={18} className="opacity-40" />
-          <span className="font-semibold text-gray-400">Volntir</span>
+      {/* Why Free section */}
+      <div className="bg-brand-dark text-white">
+        <div className="max-w-3xl mx-auto px-4 py-16 md:py-20">
+          {/* Mission statement */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/15 text-brand-500 text-xs font-semibold mb-5 border border-brand-500/20">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              Currently in Beta
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extrabold mb-4">
+              Why Is Volntir Free?
+            </h2>
+            <p className="text-gray-400 max-w-xl mx-auto leading-relaxed">
+              Our mission is simple: make it easy for organizations and attendees to manage waivers for events —
+              without the hassle of paper forms or expensive software.
+            </p>
+          </div>
+
+          {/* Core free features */}
+          <div className="grid md:grid-cols-3 gap-4 mb-10">
+            <div className="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+              <div className="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-white text-sm mb-1">Create Events</h3>
+              <p className="text-xs text-gray-500">Unlimited events, always free</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+              <div className="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-white text-sm mb-1">Collect Waivers</h3>
+              <p className="text-xs text-gray-500">Unlimited signed waivers, always free</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+              <div className="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-white text-sm mb-1">Manage Attendees</h3>
+              <p className="text-xs text-gray-500">Check-in &amp; search, always free</p>
+            </div>
+          </div>
+
+          {/* Explanation */}
+          <div className="bg-white/5 rounded-xl p-6 md:p-8 border border-white/10 mb-10">
+            <p className="text-gray-300 leading-relaxed text-sm md:text-base mb-4">
+              Volntir is currently in beta, and <strong className="text-white">the core features will always be free</strong> —
+              creating events, collecting signed waivers, and managing attendees. No credit card, no trial
+              period, no strings attached.
+            </p>
+            <p className="text-gray-400 leading-relaxed text-sm md:text-base">
+              Down the road, we plan to introduce optional premium features for organizations that need
+              advanced functionality like custom branding, analytics, and integrations. But the essentials?
+              Those stay free.
+            </p>
+          </div>
+
+          {/* CTA row */}
+          <div className="text-center">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              {!session?.user && (
+                <Link
+                  href="/auth/signup"
+                  className="px-10 py-3.5 bg-brand hover:bg-brand-hover text-white font-bold rounded-xl shadow-lg shadow-brand/25 transition-all hover:shadow-xl hover:shadow-brand/35 hover:-translate-y-0.5 text-base"
+                >
+                  Create Free Account
+                </Link>
+              )}
+              <Link
+                href="/suggest"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-white/5 text-gray-300 hover:text-white font-semibold rounded-xl hover:bg-white/10 border border-white/15 transition-all text-sm"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                Suggest a Feature
+              </Link>
+            </div>
+            <p className="text-xs text-gray-600 mt-4">
+              We&apos;re building Volntir based on real feedback. Tell us what you need.
+            </p>
+          </div>
         </div>
-        <p className="text-gray-400/80 text-xs">Volunteering, Together</p>
-      </footer>
+      </div>
     </main>
   );
 }

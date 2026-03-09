@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import EventEditForm from "@/components/EventEditForm";
 import EventManagerList from "@/components/EventManagerList";
+import EventQRCode from "@/components/EventQRCode";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,9 @@ export default async function EventDetailPage({
             </Link>
           </div>
         </div>
+
+        {/* QR Code */}
+        <EventQRCode shortCode={event.shortCode} eventName={event.name} />
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4">

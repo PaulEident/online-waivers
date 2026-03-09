@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import SessionProvider from "@/components/SessionProvider";
 import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
+import CookieConsent from "@/components/CookieConsent";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,8 +17,33 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Volntir - Digital Waiver Management",
-  description: "Collect digital liability waivers for your events. Multi-tenant, role-based, with check-in.",
+  title: {
+    default: "Volntir - Free Digital Waiver Management for Events",
+    template: "%s | Volntir",
+  },
+  description: "Free digital waiver platform for events and organizations. Collect electronic signatures, manage check-ins, and organize unlimited events — no credit card required.",
+  keywords: ["digital waivers", "electronic signatures", "event management", "liability waivers", "waiver signing", "event check-in", "free waiver platform", "volunteer management"],
+  authors: [{ name: "Volntir" }],
+  creator: "Volntir",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://volntir.com"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: "Volntir",
+    title: "Volntir - Free Digital Waiver Management for Events",
+    description: "Collect digital liability waivers, manage event check-ins, and organize unlimited events — completely free.",
+    images: [{ url: "/volntir-icon.png", width: 512, height: 512, alt: "Volntir" }],
+  },
+  twitter: {
+    card: "summary",
+    title: "Volntir - Free Digital Waiver Management",
+    description: "Collect digital liability waivers, manage event check-ins, and organize unlimited events — completely free.",
+    images: ["/volntir-icon.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   manifest: "/manifest.json",
   themeColor: "#FF5A1F",
   appleWebApp: {
@@ -46,19 +72,9 @@ export default function RootLayout({
         <SessionProvider>
           <NavBar />
           {children}
+          <Footer />
+          <CookieConsent />
         </SessionProvider>
-        {/* Service Worker disabled - enable after fixing SSL certificate trust */}
-        {/* <Script
-          id="sw-register"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js');
-              }
-            `,
-          }}
-        /> */}
       </body>
     </html>
   );
