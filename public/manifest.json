@@ -9,9 +9,9 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/volntir_app_icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/volntir-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
     },
     {
       "src": "/icons/icon-192x192.png",

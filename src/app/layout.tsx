@@ -27,10 +27,9 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/volntir_app_icon.svg", type: "image/svg+xml", sizes: "any" },
+      { url: "/volntir-icon.png", type: "image/png" },
     ],
-    apple: "/volntir_app_icon.svg",
+    apple: "/volntir-icon.png",
   },
 };
 
