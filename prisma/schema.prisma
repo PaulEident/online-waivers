@@ -92,10 +92,11 @@ model VerificationToken {
 // ──────────────────────────────────────────
 
 model Organization {
-  id             String   @id @default(cuid())
-  name           String
-  slug           String   @unique
-  waiverTemplate String   @db.Text
+  id               String   @id @default(cuid())
+  name             String
+  slug             String   @unique
+  waiverTemplate   String   @db.Text
+  mailchimpEnabled Boolean  @default(false)
 
   members OrgMember[]
   events  Event[]
@@ -119,14 +120,15 @@ model OrgMember {
 }
 
 model Event {
-  id          String    @id @default(cuid())
-  orgId       String
-  name        String
-  slug        String
-  shortCode   String    @unique
-  date        DateTime?
-  location    String?
-  description String?   @db.Text
+  id             String    @id @default(cuid())
+  orgId          String
+  name           String
+  slug           String
+  shortCode      String    @unique
+  date           DateTime?
+  location       String?
+  description    String?   @db.Text
+  waiverTemplate String?   @db.Text
 
   org      Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
   waivers  Waiver[]

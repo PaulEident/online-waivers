@@ -192,6 +192,17 @@ export async function getOrganization(orgId: string) {
   });
 }
 
+export async function toggleMailchimp(orgId: string, enabled: boolean) {
+  await requireRole(["SUPER_ADMIN"]);
+
+  await prisma.organization.update({
+    where: { id: orgId },
+    data: { mailchimpEnabled: enabled },
+  });
+  revalidatePath("/admin/super");
+  return { success: true };
+}
+
 export async function updateOrganization(orgId: string, data: { name?: string; waiverTemplate?: string }) {
   await requireOrgAccess(orgId);
 
@@ -274,6 +285,12 @@ export async function createEvent(orgId: string, data: {
     shortCode = generateShortCode();
   }
 
+  // Copy org's waiver template as the event's starting template
+  const org = await prisma.organization.findUnique({
+    where: { id: orgId },
+    select: { waiverTemplate: true },
+  });
+
   const event = await prisma.event.create({
     data: {
       orgId,
@@ -283,6 +300,7 @@ export async function createEvent(orgId: string, data: {
       date: data.date ? new Date(data.date) : null,
       location: data.location || null,
       description: data.description || null,
+      waiverTemplate: org?.waiverTemplate || DEFAULT_WAIVER_TEMPLATE,
     },
   });
 
@@ -380,6 +398,31 @@ export async function removeEventManager(eventId: string, managerId: string) {
 
   await prisma.eventManager.delete({ where: { id: managerId } });
   revalidatePath(`/admin/org/${manager.event.orgId}/events/${eventId}`);
+  return { success: true };
+}
+
+// ──────────────────────────────────────────
+// Event Waiver Templates
+// ──────────────────────────────────────────
+
+export async function updateEventWaiverTemplate(eventId: string, template: string) {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { _count: { select: { waivers: true } } },
+  });
+  if (!event) return { error: "Event not found" };
+
+  await requireOrgAccess(event.orgId);
+
+  if (event._count.waivers > 0) {
+    return { error: "This waiver has been signed and cannot be edited" };
+  }
+
+  await prisma.event.update({
+    where: { id: eventId },
+    data: { waiverTemplate: sanitizeHtml(template) },
+  });
+  revalidatePath(`/admin/org/${event.orgId}/events/${eventId}`);
   return { success: true };
 }
 

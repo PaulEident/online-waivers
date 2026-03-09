@@ -4,6 +4,7 @@ import Link from "next/link";
 import EventEditForm from "@/components/EventEditForm";
 import EventManagerList from "@/components/EventManagerList";
 import EventQRCode from "@/components/EventQRCode";
+import EventWaiverTemplateEditor from "@/components/EventWaiverTemplateEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,17 @@ export default async function EventDetailPage({
               location: event.location || "",
               description: event.description || "",
             }}
+          />
+        </div>
+
+        {/* Waiver Template */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4">Waiver Template</h2>
+          <EventWaiverTemplateEditor
+            eventId={eventId}
+            template={event.waiverTemplate || org.waiverTemplate}
+            orgTemplate={org.waiverTemplate}
+            waiverCount={event._count.waivers}
           />
         </div>
 

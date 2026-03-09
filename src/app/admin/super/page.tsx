@@ -1,5 +1,6 @@
 import { requireRole, getOrganizations, getUsers } from "@/lib/actions";
 import Link from "next/link";
+import MailchimpToggle from "@/components/MailchimpToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -94,9 +95,10 @@ export default async function SuperAdminPage() {
                     <div className="font-medium text-gray-900">{org.name}</div>
                     <div className="text-sm text-gray-500">/{org.slug}</div>
                   </div>
-                  <div className="flex gap-4 text-sm text-gray-500">
+                  <div className="flex items-center gap-4 text-sm text-gray-500">
                     <span>{org._count.members} members</span>
                     <span>{org._count.events} events</span>
+                    <MailchimpToggle orgId={org.id} enabled={org.mailchimpEnabled} />
                   </div>
                 </Link>
               ))

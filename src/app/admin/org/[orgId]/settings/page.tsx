@@ -81,7 +81,10 @@ export default function OrgSettingsPage() {
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-2">Waiver Template</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-2">Default Waiver Template</h2>
+            <p className="text-sm text-gray-500 mb-2">
+              This template is used as the starting point when creating new events. Each event gets its own copy that can be customized.
+            </p>
             <p className="text-sm text-gray-500 mb-3">
               Available variables: <code className="bg-gray-100 px-1 rounded">{"{{ORG_NAME}}"}</code>{" "}
               <code className="bg-gray-100 px-1 rounded">{"{{EVENT_NAME}}"}</code>{" "}

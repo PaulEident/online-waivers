@@ -9,9 +9,10 @@ interface EventWaiverFormProps {
   eventId: string;
   renderedTemplate: string;
   orgName: string;
+  showMailchimpOptIn?: boolean;
 }
 
-export default function EventWaiverForm({ eventId, renderedTemplate, orgName }: EventWaiverFormProps) {
+export default function EventWaiverForm({ eventId, renderedTemplate, orgName, showMailchimpOptIn = false }: EventWaiverFormProps) {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [signatureType, setSignatureType] = useState<"draw" | "type">("draw");
   const [signatureData, setSignatureData] = useState("");
@@ -233,22 +234,24 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName }: 
       </section>
 
       {/* Mailchimp Opt-in */}
-      <section>
-        <div className="flex items-start gap-3 p-4 bg-brand-light border border-orange-200 rounded-lg">
-          <input
-            type="checkbox"
-            id="mailchimpOptIn"
-            checked={mailchimpOptIn}
-            onChange={(e) => setMailchimpOptIn(e.target.checked)}
-            className="mt-1 h-5 w-5 text-brand border-gray-300 rounded focus:ring-brand"
-          />
-          <label htmlFor="mailchimpOptIn" className="text-sm text-gray-700">
-            <span className="font-semibold">Join the {orgName} mailing list</span>
-            <br />
-            <span className="text-gray-500">Stay updated on events and volunteer opportunities.</span>
-          </label>
-        </div>
-      </section>
+      {showMailchimpOptIn && (
+        <section>
+          <div className="flex items-start gap-3 p-4 bg-brand-light border border-orange-200 rounded-lg">
+            <input
+              type="checkbox"
+              id="mailchimpOptIn"
+              checked={mailchimpOptIn}
+              onChange={(e) => setMailchimpOptIn(e.target.checked)}
+              className="mt-1 h-5 w-5 text-brand border-gray-300 rounded focus:ring-brand"
+            />
+            <label htmlFor="mailchimpOptIn" className="text-sm text-gray-700">
+              <span className="font-semibold">Join the {orgName} mailing list</span>
+              <br />
+              <span className="text-gray-500">Stay updated on events and volunteer opportunities.</span>
+            </label>
+          </div>
+        </section>
+      )}
 
       {/* Submit */}
       <div className="pt-4">

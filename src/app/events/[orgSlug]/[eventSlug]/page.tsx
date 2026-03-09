@@ -22,9 +22,12 @@ export default async function EventWaiverPage({
     where: { userId_eventId: { userId: user.id, eventId: event.id } },
   });
 
+  // Use event-level template, fall back to org template for legacy events
+  const templateSource = event.waiverTemplate || event.org.waiverTemplate;
+
   // Render waiver template with variables — escape interpolated values to prevent XSS
   const renderedTemplate = sanitizeHtml(
-    event.org.waiverTemplate
+    templateSource
       .replace(/\{\{ORG_NAME\}\}/g, escapeHtml(event.org.name))
       .replace(/\{\{EVENT_NAME\}\}/g, escapeHtml(event.name))
       .replace(/\{\{EVENT_DATE\}\}/g, escapeHtml(event.date ? new Date(event.date).toLocaleDateString() : "TBD"))
@@ -85,6 +88,7 @@ export default async function EventWaiverPage({
               eventId={event.id}
               renderedTemplate={renderedTemplate}
               orgName={event.org.name}
+              showMailchimpOptIn={event.org.mailchimpEnabled}
             />
           </div>
         )}
