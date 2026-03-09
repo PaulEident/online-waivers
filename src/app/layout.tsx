@@ -32,13 +32,13 @@ export const metadata: Metadata = {
     siteName: "Volntir",
     title: "Volntir - Free Digital Waiver Management for Events",
     description: "Collect digital liability waivers, manage event check-ins, and organize unlimited events — completely free.",
-    images: [{ url: "/volntir-icon.png", width: 512, height: 512, alt: "Volntir" }],
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Volntir - Free Digital Waiver Management for Events" }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Volntir - Free Digital Waiver Management",
     description: "Collect digital liability waivers, manage event check-ins, and organize unlimited events — completely free.",
-    images: ["/volntir-icon.png"],
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
