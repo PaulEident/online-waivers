@@ -142,6 +142,30 @@ export async function createOrganization(data: { name: string; slug: string; own
   return { success: true, orgId: org.id };
 }
 
+export async function createUserOrganization(data: { name: string; slug: string }) {
+  const user = await requireAuth();
+
+  const slug = data.slug.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-");
+
+  const existing = await prisma.organization.findUnique({ where: { slug } });
+  if (existing) return { error: "An organization with this URL already exists" };
+
+  const org = await prisma.organization.create({
+    data: {
+      name: data.name,
+      slug,
+      waiverTemplate: DEFAULT_WAIVER_TEMPLATE,
+    },
+  });
+
+  await prisma.orgMember.create({
+    data: { userId: user.id, orgId: org.id, role: "OWNER" },
+  });
+
+  revalidatePath("/dashboard");
+  return { success: true, orgId: org.id };
+}
+
 export async function getOrganizations() {
   await requireRole(["SUPER_ADMIN"]);
 
