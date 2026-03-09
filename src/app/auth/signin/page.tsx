@@ -169,7 +169,7 @@ function SignInForm() {
               <button
                 type="submit"
                 disabled={loading || !turnstileToken}
-                className="w-full bg-brand hover:bg-brand-hover text-white text-sm font-semibold h-11 px-4 rounded-xl transition-all disabled:opacity-50 shadow-sm hover:shadow-md"
+                className="w-full bg-brand hover:bg-brand-hover text-white text-sm font-semibold h-11 px-4 rounded-xl transition-all disabled:cursor-not-allowed shadow-sm hover:shadow-md"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
