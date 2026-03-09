@@ -5,6 +5,7 @@ import { auth } from "./auth";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
+import { verifyTurnstile } from "./turnstile";
 
 // ──────────────────────────────────────────
 // Auth helpers
@@ -62,7 +63,21 @@ export async function requireEventAccess(eventId: string) {
 // User signup
 // ──────────────────────────────────────────
 
-export async function signUp(data: { name: string; email: string; password: string }) {
+export async function signUp(data: {
+  name: string;
+  email: string;
+  password: string;
+  turnstileToken: string;
+  honeypot?: string;
+}) {
+  // Bot protection: reject if honeypot was filled
+  if (data.honeypot) return { error: "Signup failed" };
+
+  // Bot protection: verify Turnstile token
+  if (!data.turnstileToken || !(await verifyTurnstile(data.turnstileToken))) {
+    return { error: "Verification failed. Please try again." };
+  }
+
   const existing = await prisma.user.findUnique({ where: { email: data.email } });
   if (existing) return { error: "An account with this email already exists" };
 

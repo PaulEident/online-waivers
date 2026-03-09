@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
 import bcrypt from "bcryptjs";
+import { verifyTurnstile } from "./turnstile";
 
 declare module "next-auth" {
   interface Session {
@@ -37,12 +38,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        turnstileToken: { label: "Turnstile", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
+        // Verify Turnstile token
+        const token = credentials.turnstileToken as string;
+        if (!token || !(await verifyTurnstile(token))) return null;
+
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
+          select: { id: true, name: true, email: true, image: true, password: true },
         });
 
         if (!user || !user.password) return null;
@@ -59,13 +66,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      // Allow all OAuth sign-ins
+      if (account?.provider !== "credentials") return true;
+      // For credentials, just verify user exists (authorize already validated)
+      return !!user;
+    },
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       if (new URL(url).origin === baseUrl) return url;
       return baseUrl + "/dashboard";
     },
     async jwt({ token, user, trigger }) {
-      console.log("[AUTH] jwt callback", { hasUser: !!user, trigger, tokenId: token.id, tokenSub: token.sub });
       // On sign-in: store the user id and fetch role from DB
       // This runs in Node.js runtime (not Edge) during sign-in
       if (user) {
@@ -99,7 +111,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      console.log("[AUTH] session callback", { hasUser: !!session.user, tokenId: token.id, tokenSub: token.sub });
       if (session.user && token.id) {
         session.user.id = token.id as string;
         session.user.role = (token.role as string) || "USER";
