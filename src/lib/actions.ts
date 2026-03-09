@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { verifyTurnstile } from "./turnstile";
+import { sanitizeHtml } from "./sanitize";
 
 // ──────────────────────────────────────────
 // Auth helpers
@@ -142,6 +143,8 @@ export async function createOrganization(data: { name: string; slug: string; own
 }
 
 export async function getOrganizations() {
+  await requireRole(["SUPER_ADMIN"]);
+
   return prisma.organization.findMany({
     include: {
       _count: { select: { members: true, events: true } },
@@ -151,6 +154,8 @@ export async function getOrganizations() {
 }
 
 export async function getOrganization(orgId: string) {
+  await requireOrgAccess(orgId, ["OWNER", "ADMIN", "EVENT_MANAGER"]);
+
   return prisma.organization.findUnique({
     where: { id: orgId },
     include: {
@@ -166,9 +171,15 @@ export async function getOrganization(orgId: string) {
 export async function updateOrganization(orgId: string, data: { name?: string; waiverTemplate?: string }) {
   await requireOrgAccess(orgId);
 
+  // Sanitize waiver template HTML to prevent stored XSS
+  const sanitizedData = { ...data };
+  if (sanitizedData.waiverTemplate) {
+    sanitizedData.waiverTemplate = sanitizeHtml(sanitizedData.waiverTemplate);
+  }
+
   await prisma.organization.update({
     where: { id: orgId },
-    data,
+    data: sanitizedData,
   });
   revalidatePath(`/admin/org/${orgId}`);
   return { success: true };
@@ -280,6 +291,8 @@ export async function updateEvent(eventId: string, data: {
 }
 
 export async function getEvent(eventId: string) {
+  await requireEventAccess(eventId);
+
   return prisma.event.findUnique({
     where: { id: eventId },
     include: {
@@ -444,6 +457,8 @@ async function subscribeToMailchimp(email: string, firstName: string, lastName: 
 }
 
 export async function getEventWaivers(eventId: string, search?: string) {
+  await requireEventAccess(eventId);
+
   const where: Record<string, unknown> = { eventId };
   if (search) {
     where.OR = [
@@ -463,13 +478,19 @@ export async function getEventWaivers(eventId: string, search?: string) {
 }
 
 export async function getWaiver(id: string) {
-  return prisma.waiver.findUnique({
+  const waiver = await prisma.waiver.findUnique({
     where: { id },
     include: {
       user: { select: { id: true, name: true, email: true } },
       event: { include: { org: true } },
     },
   });
+
+  if (waiver) {
+    await requireEventAccess(waiver.eventId);
+  }
+
+  return waiver;
 }
 
 export async function getUserWaivers() {
@@ -488,7 +509,7 @@ export async function getUserWaivers() {
 // ──────────────────────────────────────────
 
 export async function checkInUser(eventId: string, userId: string) {
-  const checker = await requireAuth();
+  const checker = await requireEventAccess(eventId);
 
   const existing = await prisma.checkIn.findUnique({
     where: { userId_eventId: { userId, eventId } },
@@ -503,7 +524,7 @@ export async function checkInUser(eventId: string, userId: string) {
 }
 
 export async function undoCheckIn(eventId: string, userId: string) {
-  await requireAuth();
+  await requireEventAccess(eventId);
 
   await prisma.checkIn.delete({
     where: { userId_eventId: { userId, eventId } },
@@ -513,6 +534,8 @@ export async function undoCheckIn(eventId: string, userId: string) {
 }
 
 export async function getEventCheckIns(eventId: string) {
+  await requireEventAccess(eventId);
+
   return prisma.checkIn.findMany({
     where: { eventId },
     include: {
@@ -528,6 +551,8 @@ export async function getEventCheckIns(eventId: string) {
 // ──────────────────────────────────────────
 
 export async function getUsers(search?: string) {
+  await requireRole(["SUPER_ADMIN"]);
+
   const where = search
     ? {
         OR: [

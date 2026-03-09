@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getEventBySlug, requireAuth } from "@/lib/actions";
 import { prisma } from "@/lib/prisma";
 import EventWaiverForm from "@/components/EventWaiverForm";
+import { sanitizeHtml, escapeHtml } from "@/lib/sanitize";
 
 export const dynamic = "force-dynamic";
 
@@ -21,13 +22,15 @@ export default async function EventWaiverPage({
     where: { userId_eventId: { userId: user.id, eventId: event.id } },
   });
 
-  // Render waiver template with variables
-  const renderedTemplate = event.org.waiverTemplate
-    .replace(/\{\{ORG_NAME\}\}/g, event.org.name)
-    .replace(/\{\{EVENT_NAME\}\}/g, event.name)
-    .replace(/\{\{EVENT_DATE\}\}/g, event.date ? new Date(event.date).toLocaleDateString() : "TBD")
-    .replace(/\{\{EVENT_LOCATION\}\}/g, event.location || "TBD")
-    .replace(/\{\{YEAR\}\}/g, new Date().getFullYear().toString());
+  // Render waiver template with variables — escape interpolated values to prevent XSS
+  const renderedTemplate = sanitizeHtml(
+    event.org.waiverTemplate
+      .replace(/\{\{ORG_NAME\}\}/g, escapeHtml(event.org.name))
+      .replace(/\{\{EVENT_NAME\}\}/g, escapeHtml(event.name))
+      .replace(/\{\{EVENT_DATE\}\}/g, escapeHtml(event.date ? new Date(event.date).toLocaleDateString() : "TBD"))
+      .replace(/\{\{EVENT_LOCATION\}\}/g, escapeHtml(event.location || "TBD"))
+      .replace(/\{\{YEAR\}\}/g, new Date().getFullYear().toString())
+  );
 
   return (
     <main className="min-h-screen bg-gray-100">

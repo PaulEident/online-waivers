@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireAuth, getWaiver } from "@/lib/actions";
+import { requireEventAccess, getWaiver } from "@/lib/actions";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -9,10 +9,12 @@ export default async function WaiverDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  await requireAuth();
   const { id } = await params;
   const waiver = await getWaiver(id);
   if (!waiver) notFound();
+
+  // Verify the user has access to this waiver's event/organization
+  await requireEventAccess(waiver.eventId);
 
   const familyMembers = waiver.familyMembers as Array<{ firstName: string; lastName: string; age: number }> | null;
 
