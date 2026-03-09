@@ -1,4 +1,4 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitize from "sanitize-html";
 
 // Allowlist of safe HTML tags for waiver templates
 const ALLOWED_TAGS = [
@@ -11,7 +11,9 @@ const ALLOWED_TAGS = [
   "span", "div",
 ];
 
-const ALLOWED_ATTR = ["class", "style"];
+const ALLOWED_ATTRIBUTES: Record<string, string[]> = {
+  "*": ["class", "style"],
+};
 
 /**
  * Sanitize HTML content to prevent XSS attacks.
@@ -19,9 +21,9 @@ const ALLOWED_ATTR = ["class", "style"];
  * iframes, forms, and other dangerous elements.
  */
 export function sanitizeHtml(dirty: string): string {
-  return DOMPurify.sanitize(dirty, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
+  return sanitize(dirty, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTRIBUTES,
   });
 }
 
