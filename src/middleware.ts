@@ -2,17 +2,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-// NextAuth v5 (Auth.js) uses "authjs" cookie prefix, not "next-auth"
-const COOKIE_NAME = process.env.NEXTAUTH_URL?.startsWith("https")
-  ? "__Secure-authjs.session-token"
-  : "authjs.session-token";
-
 export async function middleware(request: NextRequest) {
+  // Detect HTTPS from the actual request to determine the correct cookie name
+  const isSecure = request.nextUrl.protocol === "https:";
+  const cookieName = isSecure
+    ? "__Secure-authjs.session-token"
+    : "authjs.session-token";
+
   const token = await getToken({
     req: request,
     secret: process.env.AUTH_SECRET,
-    cookieName: COOKIE_NAME,
-    salt: COOKIE_NAME,
+    cookieName,
+    salt: cookieName,
   });
   const { pathname } = request.nextUrl;
 
