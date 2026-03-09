@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.gitignore
+.env.local
+.env*.local
+*.md
+docs/
+.vscode/
+.claude/
+dev.db
+dev.db-journal

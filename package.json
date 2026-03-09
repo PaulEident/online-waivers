@@ -6,7 +6,10 @@
     "dev": "NEXT_CLI_ANIMATIONS=0 next dev",
     "build": "prisma generate && prisma db push --skip-generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v && docker compose up --build"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
