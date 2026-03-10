@@ -26,6 +26,12 @@ enum OrgRole {
   EVENT_MANAGER
 }
 
+enum SubmissionStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+}
+
 // ──────────────────────────────────────────
 // Auth (NextAuth.js v5)
 // ──────────────────────────────────────────
@@ -208,4 +214,33 @@ model CheckIn {
   checkedInAt DateTime @default(now())
 
   @@unique([userId, eventId])
+}
+
+// ──────────────────────────────────────────
+// Submissions (Support & Feature Requests)
+// ──────────────────────────────────────────
+
+model SupportTicket {
+  id      String           @id @default(cuid())
+  name    String
+  email   String
+  subject String
+  message String           @db.Text
+  status  SubmissionStatus @default(NEW)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FeatureRequest {
+  id       String           @id @default(cuid())
+  name     String
+  email    String
+  category String
+  feature  String           @db.Text
+  problem  String?          @db.Text
+  status   SubmissionStatus @default(NEW)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
