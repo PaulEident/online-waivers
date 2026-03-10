@@ -837,3 +837,52 @@ export async function getUserOrgs() {
   });
   return memberships.map((m) => m.org);
 }
+
+// ──────────────────────────────────────────
+// Submissions (Support & Feature Requests)
+// ──────────────────────────────────────────
+
+export async function getSubmissionCounts() {
+  await requireRole(["SUPER_ADMIN"]);
+  const [supportCount, featureCount] = await Promise.all([
+    prisma.supportTicket.count({ where: { status: "NEW" } }),
+    prisma.featureRequest.count({ where: { status: "NEW" } }),
+  ]);
+  return { supportCount, featureCount, total: supportCount + featureCount };
+}
+
+export async function getSupportTickets(status?: string) {
+  await requireRole(["SUPER_ADMIN"]);
+  return prisma.supportTicket.findMany({
+    where: status && status !== "ALL" ? { status: status as "NEW" | "IN_PROGRESS" | "RESOLVED" } : undefined,
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getFeatureRequests(status?: string) {
+  await requireRole(["SUPER_ADMIN"]);
+  return prisma.featureRequest.findMany({
+    where: status && status !== "ALL" ? { status: status as "NEW" | "IN_PROGRESS" | "RESOLVED" } : undefined,
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getSupportTicket(id: string) {
+  await requireRole(["SUPER_ADMIN"]);
+  return prisma.supportTicket.findUnique({ where: { id } });
+}
+
+export async function getFeatureRequest(id: string) {
+  await requireRole(["SUPER_ADMIN"]);
+  return prisma.featureRequest.findUnique({ where: { id } });
+}
+
+export async function updateSubmissionStatus(type: "support" | "feature", id: string, status: "NEW" | "IN_PROGRESS" | "RESOLVED") {
+  await requireRole(["SUPER_ADMIN"]);
+  if (type === "support") {
+    await prisma.supportTicket.update({ where: { id }, data: { status } });
+  } else {
+    await prisma.featureRequest.update({ where: { id }, data: { status } });
+  }
+  return { success: true };
+}
