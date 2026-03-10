@@ -110,8 +110,8 @@ const DEFAULT_WAIVER_TEMPLATE = `<h3>RELEASE AND WAIVER OF LIABILITY, ASSUMPTION
 <p>I agree to indemnify, defend, and hold harmless {{ORG_NAME}} from and against any and all claims, damages, losses, and expenses arising out of my participation.</p>
 <h4>4. MEDICAL ACKNOWLEDGMENT</h4>
 <p>I certify that I am physically fit and have not been advised against participation by a medical professional. I consent to receive medical treatment in the event of injury.</p>
-<h4>5. MINORS</h4>
-<p>If signing on behalf of a minor, I certify that I am the parent or legal guardian and accept full responsibility for their participation.</p>
+<h4>5. PARENT/GUARDIAN CONSENT FOR MINORS</h4>
+<p>If I am registering minor children (under 18 years of age) as family members on this waiver, I certify that I am the parent or legal guardian of each listed minor. I agree to assume all risks on their behalf and accept full responsibility for their participation. I further agree that this Release and Waiver of Liability, Assumption of Risk, and Indemnity Agreement applies to each minor listed, with the same force and effect as if each minor had signed individually.</p>
 <h4>6. PHOTO AND MEDIA RELEASE</h4>
 <p>I grant {{ORG_NAME}} permission to use photographs and media taken during the event for promotional purposes.</p>
 <h4>7. ACKNOWLEDGMENT</h4>
@@ -569,17 +569,37 @@ async function subscribeToMailchimp(email: string, firstName: string, lastName: 
 export async function getEventWaivers(eventId: string, search?: string) {
   await requireEventAccess(eventId);
 
-  const where: Record<string, unknown> = { eventId };
   if (search) {
-    where.OR = [
-      { firstName: { contains: search, mode: "insensitive" } },
-      { lastName: { contains: search, mode: "insensitive" } },
-      { email: { contains: search, mode: "insensitive" } },
-    ];
+    // Search signer fields AND family member names (JSON array)
+    const searchLower = `%${search.toLowerCase()}%`;
+    const waiverIds = await prisma.$queryRaw<Array<{ id: string }>>`
+      SELECT id FROM "Waiver"
+      WHERE "eventId" = ${eventId}
+      AND (
+        LOWER("firstName") LIKE ${searchLower}
+        OR LOWER("lastName") LIKE ${searchLower}
+        OR LOWER("email") LIKE ${searchLower}
+        OR EXISTS (
+          SELECT 1 FROM jsonb_array_elements("familyMembers"::jsonb) AS fm
+          WHERE LOWER(fm->>'firstName') LIKE ${searchLower}
+          OR LOWER(fm->>'lastName') LIKE ${searchLower}
+        )
+      )
+    `;
+    const ids = waiverIds.map((w) => w.id);
+    if (ids.length === 0) return [];
+
+    return prisma.waiver.findMany({
+      where: { id: { in: ids } },
+      include: {
+        user: { select: { id: true, name: true, email: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
   }
 
   return prisma.waiver.findMany({
-    where,
+    where: { eventId },
     include: {
       user: { select: { id: true, name: true, email: true } },
     },

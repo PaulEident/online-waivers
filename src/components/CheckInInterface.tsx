@@ -63,7 +63,7 @@ export default function CheckInInterface({
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name or email..."
+          placeholder="Search by name, email, or minor's name..."
           autoFocus
           className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg text-lg focus:ring-2 focus:ring-brand focus:border-brand"
         />
@@ -126,11 +126,16 @@ export default function CheckInInterface({
                     {a.firstName} {a.lastName}
                     {a.familyMembers && a.familyMembers.length > 0 && (
                       <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-light text-brand">
-                        +{a.familyMembers.length} family
+                        +{a.familyMembers.length} minor{a.familyMembers.length > 1 ? "s" : ""}
                       </span>
                     )}
                   </div>
                   <div className="text-sm text-gray-500">{a.email}</div>
+                  {a.familyMembers && a.familyMembers.length > 0 && (
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      Minors: {a.familyMembers.map((fm) => `${fm.firstName} ${fm.lastName} (${fm.age})`).join(", ")}
+                    </div>
+                  )}
                   {a.checkedIn && a.checkedInAt && (
                     <div className="text-xs text-accent">
                       Checked in {new Date(a.checkedInAt).toLocaleTimeString()}
