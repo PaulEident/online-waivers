@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { updateEventWaiverTemplate } from "@/lib/actions";
+import WaiverEditor from "@/components/WaiverEditor";
 
 export default function EventWaiverTemplateEditor({
   eventId,
@@ -53,20 +54,10 @@ export default function EventWaiverTemplateEditor({
         </div>
       )}
 
-      <p className="text-sm text-gray-500 mb-3">
-        Available variables: <code className="bg-gray-100 px-1 rounded">{"{{ORG_NAME}}"}</code>{" "}
-        <code className="bg-gray-100 px-1 rounded">{"{{EVENT_NAME}}"}</code>{" "}
-        <code className="bg-gray-100 px-1 rounded">{"{{EVENT_DATE}}"}</code>{" "}
-        <code className="bg-gray-100 px-1 rounded">{"{{EVENT_LOCATION}}"}</code>{" "}
-        <code className="bg-gray-100 px-1 rounded">{"{{YEAR}}"}</code>
-      </p>
-
-      <textarea
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        rows={16}
-        disabled={locked}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md font-mono text-sm focus:ring-2 focus:ring-brand focus:border-brand disabled:bg-gray-50 disabled:text-gray-500"
+      <WaiverEditor
+        content={value}
+        onChange={setValue}
+        editable={!locked}
       />
 
       {!locked && (
