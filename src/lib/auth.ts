@@ -96,14 +96,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
 
-      // On update trigger (e.g. after role change), refresh from DB
+      // On update trigger (e.g. after role/profile change), refresh from DB
       if (trigger === "update" && token.id) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { role: true },
+            select: { role: true, image: true, name: true },
           });
           token.role = dbUser?.role || "USER";
+          token.picture = dbUser?.image;
+          token.name = dbUser?.name;
         } catch {
           // Edge runtime fallback
         }

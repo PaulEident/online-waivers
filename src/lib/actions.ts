@@ -7,6 +7,8 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { verifyTurnstile } from "./turnstile";
 import { sanitizeHtml } from "./sanitize";
+import crypto from "crypto";
+import { sendPasswordResetEmail } from "./email";
 
 // ──────────────────────────────────────────
 // Auth helpers
@@ -611,6 +613,168 @@ export async function getEventCheckIns(eventId: string) {
     },
     orderBy: { checkedInAt: "desc" },
   });
+}
+
+// ──────────────────────────────────────────
+// Password Reset
+// ──────────────────────────────────────────
+
+export async function requestPasswordReset(data: { email: string; turnstileToken: string }) {
+  if (!data.turnstileToken || !(await verifyTurnstile(data.turnstileToken))) {
+    return { error: "Verification failed. Please try again." };
+  }
+
+  // Always return success to prevent email enumeration
+  const successMsg = "If an account exists with that email, we've sent a password reset link.";
+
+  const user = await prisma.user.findUnique({ where: { email: data.email } });
+  if (!user || !user.password) return { success: true, message: successMsg };
+
+  // Delete any existing reset tokens for this email
+  await prisma.verificationToken.deleteMany({ where: { identifier: data.email } });
+
+  // Generate and hash token
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = await bcrypt.hash(rawToken, 10);
+
+  await prisma.verificationToken.create({
+    data: {
+      identifier: data.email,
+      token: hashedToken,
+      expires: new Date(Date.now() + 3600000), // 1 hour
+    },
+  });
+
+  try {
+    await sendPasswordResetEmail(data.email, rawToken);
+  } catch (error) {
+    console.error("Failed to send reset email:", error);
+  }
+
+  return { success: true, message: successMsg };
+}
+
+export async function resetPassword(data: { email: string; token: string; password: string }) {
+  if (data.password.length < 8) return { error: "Password must be at least 8 characters" };
+
+  const tokens = await prisma.verificationToken.findMany({
+    where: { identifier: data.email },
+  });
+
+  let matchedToken = null;
+  for (const t of tokens) {
+    if (await bcrypt.compare(data.token, t.token)) {
+      matchedToken = t;
+      break;
+    }
+  }
+
+  if (!matchedToken) return { error: "Invalid or expired reset link" };
+
+  if (matchedToken.expires < new Date()) {
+    await prisma.verificationToken.delete({
+      where: { identifier_token: { identifier: matchedToken.identifier, token: matchedToken.token } },
+    });
+    return { error: "This reset link has expired" };
+  }
+
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { email: data.email },
+      data: { password: hashedPassword },
+    }),
+    prisma.verificationToken.delete({
+      where: { identifier_token: { identifier: matchedToken.identifier, token: matchedToken.token } },
+    }),
+  ]);
+
+  return { success: true };
+}
+
+// ──────────────────────────────────────────
+// User Profile
+// ──────────────────────────────────────────
+
+export async function getProfile() {
+  const sessionUser = await requireAuth();
+
+  const user = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      bio: true,
+      password: true,
+      accounts: { select: { provider: true } },
+    },
+  });
+
+  if (!user) redirect("/auth/signin");
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    image: user.image,
+    bio: user.bio,
+    hasPassword: !!user.password,
+    hasGoogle: user.accounts.some((a) => a.provider === "google"),
+  };
+}
+
+export async function updateProfile(data: { name?: string; bio?: string }) {
+  const user = await requireAuth();
+
+  if (data.name !== undefined && data.name.trim() === "") {
+    return { error: "Name cannot be empty" };
+  }
+
+  if (data.bio !== undefined && data.bio.length > 500) {
+    return { error: "Bio must be 500 characters or less" };
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      ...(data.name !== undefined && { name: data.name.trim() }),
+      ...(data.bio !== undefined && { bio: data.bio.trim() || null }),
+    },
+  });
+
+  revalidatePath("/account");
+  return { success: true };
+}
+
+export async function changePassword(data: { currentPassword: string; newPassword: string }) {
+  const sessionUser = await requireAuth();
+
+  const user = await prisma.user.findUnique({
+    where: { id: sessionUser.id },
+    select: { password: true },
+  });
+
+  if (!user?.password) {
+    return { error: "Password change is not available for Google-only accounts" };
+  }
+
+  const isValid = await bcrypt.compare(data.currentPassword, user.password);
+  if (!isValid) return { error: "Current password is incorrect" };
+
+  if (data.newPassword.length < 8) {
+    return { error: "New password must be at least 8 characters" };
+  }
+
+  const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+  await prisma.user.update({
+    where: { id: sessionUser.id },
+    data: { password: hashedPassword },
+  });
+
+  return { success: true };
 }
 
 // ──────────────────────────────────────────

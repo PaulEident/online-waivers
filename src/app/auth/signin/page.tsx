@@ -152,6 +152,11 @@ function SignInForm() {
                   )}
                 </button>
               </div>
+              <div className="text-right -mt-1">
+                <Link href="/auth/forgot-password" className="text-sm text-brand hover:text-brand-hover font-medium">
+                  Forgot password?
+                </Link>
+              </div>
               {/* Honeypot — hidden from real users, bots auto-fill it */}
               <div className="absolute -left-[9999px]" aria-hidden="true">
                 <input

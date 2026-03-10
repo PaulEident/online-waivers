@@ -15,6 +15,10 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-gray-400 text-sm mt-1">
             Welcome, <span className="text-gray-200">{user.name || user.email}</span>
+            <span className="mx-2">·</span>
+            <Link href="/account" className="text-gray-400 hover:text-white transition-colors underline underline-offset-2">
+              Edit profile
+            </Link>
           </p>
         </div>
       </div>
