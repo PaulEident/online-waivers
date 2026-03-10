@@ -83,6 +83,14 @@ export default function WaiverEditor({
     }
   }, [editor, editable]);
 
+  // Close variable dropdown when clicking outside
+  useEffect(() => {
+    if (!showVariables) return;
+    const handleClickOutside = () => setShowVariables(false);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [showVariables]);
+
   const insertVariable = useCallback(
     (variable: string) => {
       if (editor) {
@@ -180,7 +188,10 @@ export default function WaiverEditor({
         <div className="relative">
           <button
             type="button"
-            onClick={() => setShowVariables(!showVariables)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowVariables(!showVariables);
+            }}
             disabled={!editable}
             className="px-2 py-1 text-sm font-medium rounded bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             title="Insert Variable"
