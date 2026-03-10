@@ -9,6 +9,7 @@ interface EventEditFormProps {
   defaultValues: {
     name: string;
     date: string;
+    endDate: string;
     location: string;
     description: string;
   };
@@ -17,6 +18,7 @@ interface EventEditFormProps {
 export default function EventEditForm({ eventId, defaultValues }: EventEditFormProps) {
   const [name, setName] = useState(defaultValues.name);
   const [date, setDate] = useState(defaultValues.date);
+  const [endDate, setEndDate] = useState(defaultValues.endDate);
   const [location, setLocation] = useState(defaultValues.location);
   const [description, setDescription] = useState(defaultValues.description);
   const [saving, setSaving] = useState(false);
@@ -31,6 +33,7 @@ export default function EventEditForm({ eventId, defaultValues }: EventEditFormP
     const result = await updateEvent(eventId, {
       name,
       date: date || null,
+      endDate: endDate || null,
       location: location || null,
       description: description || null,
     });
@@ -66,7 +69,7 @@ export default function EventEditForm({ eventId, defaultValues }: EventEditFormP
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="eventDate" className="block text-sm font-medium text-gray-700 mb-1">
-            Date
+            Start Date
           </label>
           <input
             type="datetime-local"
@@ -77,17 +80,30 @@ export default function EventEditForm({ eventId, defaultValues }: EventEditFormP
           />
         </div>
         <div>
-          <label htmlFor="eventLocation" className="block text-sm font-medium text-gray-700 mb-1">
-            Location
+          <label htmlFor="eventEndDate" className="block text-sm font-medium text-gray-700 mb-1">
+            End Date <span className="text-gray-400 font-normal">(multi-day)</span>
           </label>
           <input
-            type="text"
-            id="eventLocation"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            type="datetime-local"
+            id="eventEndDate"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            min={date}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-brand"
           />
         </div>
+      </div>
+      <div>
+        <label htmlFor="eventLocation" className="block text-sm font-medium text-gray-700 mb-1">
+          Location
+        </label>
+        <input
+          type="text"
+          id="eventLocation"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-brand"
+        />
       </div>
       <div>
         <label htmlFor="eventDesc" className="block text-sm font-medium text-gray-700 mb-1">

@@ -1,6 +1,7 @@
 import { requireOrgAccess, getOrganization } from "@/lib/actions";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { formatEventDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -52,7 +53,7 @@ export default async function OrgEventsPage({
                     <div className="text-xs text-gray-500">{event.location || "—"}</div>
                   </td>
                   <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">
-                    {event.date ? new Date(event.date).toLocaleDateString() : "—"}
+                    {formatEventDate(event.date, event.endDate, { short: true })}
                   </td>
                   <td className="px-4 py-3 text-center">{event._count.waivers}</td>
                   <td className="px-4 py-3 text-center">{event._count.checkIns}</td>

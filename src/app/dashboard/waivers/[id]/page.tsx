@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getUserWaiver } from "@/lib/actions";
 import Link from "next/link";
+import { formatEventDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,7 @@ export default async function WaiverDetailPage({
           <div className="text-sm text-gray-500">{waiver.event.org.name}</div>
           {waiver.event.date && (
             <div className="text-sm text-gray-500 mt-1">
-              {new Date(waiver.event.date).toLocaleDateString()}
+              {formatEventDate(waiver.event.date, waiver.event.endDate)}
             </div>
           )}
         </div>

@@ -10,6 +10,7 @@ export default function NewEventPage() {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [date, setDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
@@ -26,7 +27,7 @@ export default function NewEventPage() {
     setError("");
     setLoading(true);
 
-    const result = await createEvent(orgId, { name, slug, date: date || undefined, location, description });
+    const result = await createEvent(orgId, { name, slug, date: date || undefined, endDate: endDate || undefined, location, description });
 
     if (result.error) {
       setError(result.error);
@@ -83,7 +84,7 @@ export default function NewEventPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-                  Date
+                  Start Date
                 </label>
                 <input
                   type="datetime-local"
@@ -94,18 +95,31 @@ export default function NewEventPage() {
                 />
               </div>
               <div>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
+                <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  End Date <span className="text-gray-400 font-normal">(multi-day)</span>
                 </label>
                 <input
-                  type="text"
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  placeholder="Ge-Che Trail, Iron River, MI"
+                  type="datetime-local"
+                  id="endDate"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  min={date}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-brand"
                 />
               </div>
+            </div>
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                Location
+              </label>
+              <input
+                type="text"
+                id="location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Ge-Che Trail, Iron River, MI"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-brand"
+              />
             </div>
             <div>
               <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">

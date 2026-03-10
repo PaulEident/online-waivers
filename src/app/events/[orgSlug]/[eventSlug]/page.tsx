@@ -3,6 +3,7 @@ import { getEventBySlug, requireAuth } from "@/lib/actions";
 import { prisma } from "@/lib/prisma";
 import EventWaiverForm from "@/components/EventWaiverForm";
 import { sanitizeHtml, escapeHtml } from "@/lib/sanitize";
+import { formatEventDate, formatEventDateForTemplate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export default async function EventWaiverPage({
     templateSource
       .replace(/\{\{ORG_NAME\}\}/g, escapeHtml(event.org.name))
       .replace(/\{\{EVENT_NAME\}\}/g, escapeHtml(event.name))
-      .replace(/\{\{EVENT_DATE\}\}/g, escapeHtml(event.date ? new Date(event.date).toLocaleDateString() : "TBD"))
+      .replace(/\{\{EVENT_DATE\}\}/g, escapeHtml(formatEventDateForTemplate(event.date, event.endDate)))
       .replace(/\{\{EVENT_LOCATION\}\}/g, escapeHtml(event.location || "TBD"))
       .replace(/\{\{YEAR\}\}/g, new Date().getFullYear().toString())
   );
@@ -43,12 +44,7 @@ export default async function EventWaiverPage({
           <div className="text-gray-300 text-lg md:text-xl font-medium">{event.name}</div>
           {event.date && (
             <div className="text-gray-400 text-sm mt-1">
-              {new Date(event.date).toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {formatEventDate(event.date, event.endDate)}
             </div>
           )}
           {event.location && (

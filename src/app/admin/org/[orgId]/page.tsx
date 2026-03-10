@@ -1,6 +1,7 @@
 import { requireOrgAccess, getOrganization } from "@/lib/actions";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { formatEventDate } from "@/lib/dates";
 
 export const dynamic = "force-dynamic";
 
@@ -106,14 +107,7 @@ export default async function OrgDashboardPage({
                         {event.name}
                       </Link>
                       <div className="text-sm text-gray-500">
-                        {event.date
-                          ? new Date(event.date).toLocaleDateString("en-US", {
-                              weekday: "short",
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })
-                          : "No date set"}
+                        {formatEventDate(event.date, event.endDate, { short: true })}
                         {event.location && ` · ${event.location}`}
                       </div>
                       <div className="text-xs text-gray-400 mt-1">

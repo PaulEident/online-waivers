@@ -1,11 +1,13 @@
 import { requireOrgAccess, getEvent, getOrganization } from "@/lib/actions";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import Link from "next/link";
 import EventEditForm from "@/components/EventEditForm";
 import EventManagerList from "@/components/EventManagerList";
 import EventQRCode from "@/components/EventQRCode";
 import EventWaiverTemplateEditor from "@/components/EventWaiverTemplateEditor";
 import EventDeleteButton from "@/components/EventDeleteButton";
+import CopyableUrl from "@/components/CopyableUrl";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +22,15 @@ export default async function EventDetailPage({
   const org = await getOrganization(orgId);
   if (!event || !org) notFound();
 
-  const waiverUrl = `/events/${org.slug}/${event.slug}`;
-  const shortUrl = `/e/${event.shortCode}`;
+  const headersList = await headers();
+  const host = headersList.get("host") || "localhost:3000";
+  const protocol = host.startsWith("localhost") ? "http" : "https";
+  const baseUrl = `${protocol}://${host}`;
+
+  const waiverPath = `/events/${org.slug}/${event.slug}`;
+  const shortPath = `/e/${event.shortCode}`;
+  const waiverUrl = `${baseUrl}${waiverPath}`;
+  const shortUrl = `${baseUrl}${shortPath}`;
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -36,23 +45,13 @@ export default async function EventDetailPage({
         {/* URLs */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-3">Shareable Links</h2>
-          <div className="space-y-2">
-            <div>
-              <span className="text-xs text-gray-500">Full URL:</span>
-              <div className="font-mono text-sm text-brand bg-brand-light px-3 py-2 rounded">
-                {waiverUrl}
-              </div>
-            </div>
-            <div>
-              <span className="text-xs text-gray-500">Short URL:</span>
-              <div className="font-mono text-sm text-brand bg-brand-light px-3 py-2 rounded">
-                {shortUrl}
-              </div>
-            </div>
+          <div className="space-y-3">
+            <CopyableUrl label="Full URL" url={waiverUrl} />
+            <CopyableUrl label="Short URL" url={shortUrl} />
           </div>
           <div className="mt-3 flex gap-3">
             <Link
-              href={waiverUrl}
+              href={waiverPath}
               className="text-sm text-brand hover:text-brand-hover underline"
               target="_blank"
             >
@@ -96,6 +95,7 @@ export default async function EventDetailPage({
             defaultValues={{
               name: event.name,
               date: event.date ? new Date(event.date).toISOString().slice(0, 16) : "",
+              endDate: event.endDate ? new Date(event.endDate).toISOString().slice(0, 16) : "",
               location: event.location || "",
               description: event.description || "",
             }}

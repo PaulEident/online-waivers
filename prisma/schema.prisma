@@ -133,6 +133,7 @@ model Event {
   slug           String
   shortCode      String    @unique
   date           DateTime?
+  endDate        DateTime?
   location       String?
   description    String?   @db.Text
   waiverTemplate String?   @db.Text

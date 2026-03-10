@@ -269,6 +269,7 @@ export async function createEvent(orgId: string, data: {
   name: string;
   slug: string;
   date?: string;
+  endDate?: string;
   location?: string;
   description?: string;
 }) {
@@ -300,6 +301,7 @@ export async function createEvent(orgId: string, data: {
       slug,
       shortCode,
       date: data.date ? new Date(data.date) : null,
+      endDate: data.endDate ? new Date(data.endDate) : null,
       location: data.location || null,
       description: data.description || null,
       waiverTemplate: org?.waiverTemplate || DEFAULT_WAIVER_TEMPLATE,
@@ -313,6 +315,7 @@ export async function createEvent(orgId: string, data: {
 export async function updateEvent(eventId: string, data: {
   name?: string;
   date?: string | null;
+  endDate?: string | null;
   location?: string | null;
   description?: string | null;
 }) {
@@ -326,6 +329,7 @@ export async function updateEvent(eventId: string, data: {
     data: {
       ...(data.name !== undefined && { name: data.name }),
       ...(data.date !== undefined && { date: data.date ? new Date(data.date) : null }),
+      ...(data.endDate !== undefined && { endDate: data.endDate ? new Date(data.endDate) : null }),
       ...(data.location !== undefined && { location: data.location }),
       ...(data.description !== undefined && { description: data.description }),
     },
