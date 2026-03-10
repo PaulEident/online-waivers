@@ -8,7 +8,7 @@ import bcrypt from "bcryptjs";
 import { verifyTurnstile } from "./turnstile";
 import { sanitizeHtml } from "./sanitize";
 import crypto from "crypto";
-import { sendPasswordResetEmail } from "./email";
+import { sendPasswordResetEmail, sendWaiverConfirmationEmail } from "./email";
 
 // ──────────────────────────────────────────
 // Auth helpers
@@ -479,6 +479,20 @@ export async function submitWaiver(data: WaiverInput) {
       familyMembers: data.familyMembers.length > 0 ? data.familyMembers : undefined,
     },
   });
+
+  // Send confirmation email (non-blocking, don't fail submission)
+  try {
+    await sendWaiverConfirmationEmail(
+      data.email,
+      data.firstName,
+      event.name,
+      event.org.name,
+      new Date(),
+      data.familyMembers.length
+    );
+  } catch (error) {
+    console.error("Waiver confirmation email error:", error);
+  }
 
   // Subscribe to Mailchimp if opted in
   if (data.mailchimpOptIn) {
