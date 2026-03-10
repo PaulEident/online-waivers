@@ -5,6 +5,7 @@ import EventEditForm from "@/components/EventEditForm";
 import EventManagerList from "@/components/EventManagerList";
 import EventQRCode from "@/components/EventQRCode";
 import EventWaiverTemplateEditor from "@/components/EventWaiverTemplateEditor";
+import EventDeleteButton from "@/components/EventDeleteButton";
 
 export const dynamic = "force-dynamic";
 
@@ -122,6 +123,19 @@ export default async function EventDetailPage({
               name: m.user.name || m.user.email || "",
               email: m.user.email || "",
             }))}
+          />
+        </div>
+
+        {/* Danger Zone */}
+        <div className="bg-white rounded-lg shadow p-6 border border-red-200">
+          <h2 className="text-lg font-bold text-red-600 mb-2">Danger Zone</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Permanently delete this event and all associated data.
+          </p>
+          <EventDeleteButton
+            eventId={eventId}
+            eventName={event.name}
+            hasWaivers={event._count.waivers > 0}
           />
         </div>
 

@@ -334,6 +334,29 @@ export async function updateEvent(eventId: string, data: {
   return { success: true };
 }
 
+export async function deleteEvent(eventId: string) {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { _count: { select: { waivers: true } } },
+  });
+  if (!event) return { error: "Event not found" };
+
+  await requireOrgAccess(event.orgId);
+
+  if (event._count.waivers > 0) {
+    return { error: "Cannot delete an event that has signed waivers. Remove all waivers first." };
+  }
+
+  await prisma.$transaction([
+    prisma.eventManager.deleteMany({ where: { eventId } }),
+    prisma.checkIn.deleteMany({ where: { eventId } }),
+    prisma.event.delete({ where: { id: eventId } }),
+  ]);
+
+  revalidatePath(`/admin/org/${event.orgId}/events`);
+  redirect(`/admin/org/${event.orgId}/events`);
+}
+
 export async function getEvent(eventId: string) {
   await requireEventAccess(eventId);
 
