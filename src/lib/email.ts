@@ -2,8 +2,20 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+function getBaseUrl(): string {
+  // Explicit override (set in Vercel env vars or .env)
+  if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;
+  // Vercel auto-provides the production domain
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL)
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  // Vercel auto-provides the deployment URL (preview/branch deploys)
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  // Local dev fallback
+  return "http://localhost:3000";
+}
+
 export async function sendPasswordResetEmail(email: string, token: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl = getBaseUrl();
   const resetUrl = `${baseUrl}/auth/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
   const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
 
@@ -45,7 +57,7 @@ export async function sendWaiverConfirmationEmail(
   signedAt: Date,
   familyMemberCount: number
 ) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  const baseUrl = getBaseUrl();
   const dashboardUrl = `${baseUrl}/dashboard`;
   const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
 
