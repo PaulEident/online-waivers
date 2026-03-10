@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { updateOrganization, getOrganization } from "@/lib/actions";
 import Link from "next/link";
+import WaiverEditor from "@/components/WaiverEditor";
 
 export default function OrgSettingsPage() {
   const { orgId } = useParams<{ orgId: string }>();
@@ -82,21 +83,12 @@ export default function OrgSettingsPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-2">Default Waiver Template</h2>
-            <p className="text-sm text-gray-500 mb-2">
+            <p className="text-sm text-gray-500 mb-3">
               This template is used as the starting point when creating new events. Each event gets its own copy that can be customized.
             </p>
-            <p className="text-sm text-gray-500 mb-3">
-              Available variables: <code className="bg-gray-100 px-1 rounded">{"{{ORG_NAME}}"}</code>{" "}
-              <code className="bg-gray-100 px-1 rounded">{"{{EVENT_NAME}}"}</code>{" "}
-              <code className="bg-gray-100 px-1 rounded">{"{{EVENT_DATE}}"}</code>{" "}
-              <code className="bg-gray-100 px-1 rounded">{"{{EVENT_LOCATION}}"}</code>{" "}
-              <code className="bg-gray-100 px-1 rounded">{"{{YEAR}}"}</code>
-            </p>
-            <textarea
-              value={waiverTemplate}
-              onChange={(e) => setWaiverTemplate(e.target.value)}
-              rows={20}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md font-mono text-sm focus:ring-2 focus:ring-brand focus:border-brand"
+            <WaiverEditor
+              content={waiverTemplate}
+              onChange={setWaiverTemplate}
             />
           </div>
 
