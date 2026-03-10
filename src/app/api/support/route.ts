@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, category, feature, problem } = await req.json();
+    const { name, email, subject, message } = await req.json();
 
-    if (!name || !email || !category || !feature) {
+    if (!name || !email || !subject || !message) {
       return NextResponse.json({ error: "Please fill in all required fields" }, { status: 400 });
     }
 
@@ -13,18 +13,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
     }
 
-    if (name.length > 200 || email.length > 200 || category.length > 100 || feature.length > 5000 || (problem && problem.length > 5000)) {
+    if (name.length > 200 || email.length > 200 || subject.length > 200 || message.length > 5000) {
       return NextResponse.json({ error: "Input too long" }, { status: 400 });
     }
 
-    await prisma.featureRequest.create({
-      data: {
-        name,
-        email,
-        category,
-        feature,
-        problem: problem || null,
-      },
+    await prisma.supportTicket.create({
+      data: { name, email, subject, message },
     });
 
     return NextResponse.json({ ok: true });
