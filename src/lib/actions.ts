@@ -610,6 +610,16 @@ export async function getUserWaivers() {
   });
 }
 
+export async function getUserWaiver(id: string) {
+  const user = await requireAuth();
+  return prisma.waiver.findFirst({
+    where: { id, userId: user.id },
+    include: {
+      event: { include: { org: true } },
+    },
+  });
+}
+
 // ──────────────────────────────────────────
 // Check-ins
 // ──────────────────────────────────────────
