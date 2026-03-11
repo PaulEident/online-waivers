@@ -167,8 +167,8 @@ model EventManager {
 // ──────────────────────────────────────────
 
 model Waiver {
-  id      String @id @default(cuid())
-  userId  String
+  id      String  @id @default(cuid())
+  userId  String?
   eventId String
 
   // Participant info
@@ -194,12 +194,13 @@ model Waiver {
   // Marketing opt-in
   mailchimpOptIn Boolean @default(false)
 
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 
   @@unique([userId, eventId])
+  @@unique([email, eventId])
 }
 
 model CheckIn {

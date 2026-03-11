@@ -47,9 +47,16 @@ export default async function WaiverDetailPage({
 
         {/* Participant Info */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">
-            Participant Information
-          </h2>
+          <div className="flex items-center gap-3 mb-4 border-b border-gray-200 pb-2">
+            <h2 className="text-lg font-bold text-gray-900">
+              Participant Information
+            </h2>
+            {!waiver.userId && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                Guest
+              </span>
+            )}
+          </div>
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <dt className="text-xs text-gray-500">Full Name</dt>

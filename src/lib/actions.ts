@@ -475,13 +475,22 @@ interface WaiverInput {
 }
 
 export async function submitWaiver(data: WaiverInput) {
-  const user = await requireAuth();
+  const session = await auth();
+  const userId = session?.user?.id || null;
 
-  // Check for existing waiver
-  const existing = await prisma.waiver.findUnique({
-    where: { userId_eventId: { userId: user.id, eventId: data.eventId } },
+  // Check for existing waiver by authenticated user
+  if (userId) {
+    const existingByUser = await prisma.waiver.findUnique({
+      where: { userId_eventId: { userId, eventId: data.eventId } },
+    });
+    if (existingByUser) return { error: "You have already signed a waiver for this event" };
+  }
+
+  // Check for existing waiver by email (prevents duplicates for guests and authenticated users)
+  const existingByEmail = await prisma.waiver.findUnique({
+    where: { email_eventId: { email: data.email, eventId: data.eventId } },
   });
-  if (existing) return { error: "You have already signed a waiver for this event" };
+  if (existingByEmail) return { error: "A waiver has already been signed with this email for this event" };
 
   const event = await prisma.event.findUnique({
     where: { id: data.eventId },
@@ -489,9 +498,11 @@ export async function submitWaiver(data: WaiverInput) {
   });
   if (!event) return { error: "Event not found" };
 
+  const isGuest = !userId;
+
   await prisma.waiver.create({
     data: {
-      userId: user.id,
+      userId,
       eventId: data.eventId,
       firstName: data.firstName,
       lastName: data.lastName,
@@ -515,7 +526,8 @@ export async function submitWaiver(data: WaiverInput) {
       event.name,
       event.org.name,
       new Date(),
-      data.familyMembers.length
+      data.familyMembers.length,
+      isGuest
     );
   } catch (error) {
     console.error("Waiver confirmation email error:", error);
@@ -531,7 +543,7 @@ export async function submitWaiver(data: WaiverInput) {
   }
 
   redirect(
-    `/thank-you?name=${encodeURIComponent(data.firstName)}&count=${data.familyMembers.length}&event=${encodeURIComponent(event.name)}&org=${encodeURIComponent(event.org.name)}`
+    `/thank-you?name=${encodeURIComponent(data.firstName)}&count=${data.familyMembers.length}&event=${encodeURIComponent(event.name)}&org=${encodeURIComponent(event.org.name)}${isGuest ? "&guest=true" : ""}`
   );
 }
 

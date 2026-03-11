@@ -25,12 +25,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(signInUrl);
   }
 
-  // Protect event waiver pages
-  if (pathname.startsWith("/events/") && !isLoggedIn) {
-    const signInUrl = new URL(`/auth/signin?callbackUrl=${encodeURIComponent(pathname)}`, request.url);
-    return NextResponse.redirect(signInUrl);
-  }
-
   // Protect dashboard
   if (pathname.startsWith("/dashboard") && !isLoggedIn) {
     const signInUrl = new URL(`/auth/signin?callbackUrl=${encodeURIComponent(pathname)}`, request.url);
@@ -41,5 +35,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/events/:path*", "/dashboard/:path*"],
+  matcher: ["/admin/:path*", "/dashboard/:path*"],
 };

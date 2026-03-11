@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { signUp } from "@/lib/actions";
 import Turnstile from "@/components/Turnstile";
@@ -70,13 +69,6 @@ function SignUpForm() {
           <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl" />
         </div>
         <div className="relative text-center text-white px-12 max-w-md">
-          <Image
-            src="/volntir-icon.png"
-            alt=""
-            width={64}
-            height={64}
-            className="mx-auto mb-6 drop-shadow-lg"
-          />
           <h2 className="text-3xl font-bold mb-3">Get started free</h2>
           <p className="text-gray-400 leading-relaxed">
             Create your account and start collecting digital waivers for your events in minutes.
@@ -86,24 +78,8 @@ function SignUpForm() {
 
       {/* Form panel */}
       <div className="flex-1 flex flex-col">
-        {/* Mobile brand header */}
-        <div className="lg:hidden bg-brand-dark px-6 py-6 text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Image src="/volntir-icon.png" alt="" width={32} height={32} priority />
-            <span className="text-xl font-bold text-white">Volntir</span>
-          </Link>
-        </div>
-
         <div className="flex-1 flex items-start lg:items-center justify-center px-6 py-8 bg-gray-50">
           <div className="w-full max-w-sm">
-            {/* Desktop logo */}
-            <div className="hidden lg:block text-center mb-8">
-              <Link href="/" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
-                <Image src="/volntir-icon.png" alt="" width={32} height={32} priority />
-                <span className="text-xl font-bold text-gray-900">Volntir</span>
-              </Link>
-            </div>
-
             <h1 className="text-2xl font-bold text-gray-900 mb-1 mt-4 lg:mt-0">Create account</h1>
             <p className="text-gray-500 text-sm mb-6">Start managing your events today</p>
 

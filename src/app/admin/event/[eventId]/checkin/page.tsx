@@ -30,9 +30,9 @@ export default async function CheckInPage({
     email: w.email,
     familyMembers: w.familyMembers as Array<{ firstName: string; lastName: string; age: number }> | null,
     signedAt: w.createdAt.toISOString(),
-    checkedIn: checkInMap.has(w.userId),
-    checkedInAt: checkInMap.get(w.userId)?.checkedInAt?.toISOString() || null,
-    checkedInBy: checkInMap.get(w.userId)?.checker?.name || null,
+    checkedIn: w.userId ? checkInMap.has(w.userId) : false,
+    checkedInAt: w.userId ? checkInMap.get(w.userId)?.checkedInAt?.toISOString() || null : null,
+    checkedInBy: w.userId ? checkInMap.get(w.userId)?.checker?.name || null : null,
   }));
 
   return (

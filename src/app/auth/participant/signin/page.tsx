@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Turnstile from "@/components/Turnstile";
 
-function SignInForm() {
+function ParticipantSignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +17,21 @@ function SignInForm() {
   const [honeypot, setHoneypot] = useState("");
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const eventName = searchParams.get("eventName") || "";
+  const orgName = searchParams.get("orgName") || "";
+  const eventDate = searchParams.get("eventDate") || "";
+
+  // Build guest URL from callbackUrl
+  const guestUrl = callbackUrl.includes("?")
+    ? `${callbackUrl}&guest=true`
+    : `${callbackUrl}?guest=true`;
+
+  // Build participant signup URL preserving all params
+  const signupParams = new URLSearchParams();
+  signupParams.set("callbackUrl", callbackUrl);
+  if (eventName) signupParams.set("eventName", eventName);
+  if (orgName) signupParams.set("orgName", orgName);
+  if (eventDate) signupParams.set("eventDate", eventDate);
 
   async function handleCredentials(e: React.FormEvent) {
     e.preventDefault();
@@ -58,19 +73,60 @@ function SignInForm() {
           <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl" />
         </div>
         <div className="relative text-center text-white px-12 max-w-md">
-          <h2 className="text-3xl font-bold mb-3">Welcome back</h2>
-          <p className="text-gray-400 leading-relaxed">
-            Sign in to manage your events, track waivers, and check in attendees.
+          <h2 className="text-3xl font-bold mb-3">
+            Digital Waivers,<br />
+            <span className="bg-gradient-to-r from-brand-500 via-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Simplified
+            </span>
+          </h2>
+          <p className="text-gray-400 leading-relaxed mb-8">
+            Collect digital liability waivers for your events. Manage organizations,
+            check in attendees, and keep everything organized.
           </p>
+
+          {/* Event context */}
+          {(orgName || eventName) && (
+            <div className="bg-white/5 rounded-xl p-5 border border-white/10 text-left">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Signing waiver for</p>
+              {orgName && (
+                <p className="text-white font-bold text-lg">{orgName}</p>
+              )}
+              {eventName && (
+                <p className="text-gray-300 font-medium">{eventName}</p>
+              )}
+              {eventDate && (
+                <p className="text-gray-500 text-sm mt-1">{eventDate}</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Form panel */}
       <div className="flex-1 flex flex-col">
+        {/* Mobile brand header with event context */}
+        <div className="lg:hidden bg-brand-dark px-6 py-6">
+          {(orgName || eventName) && (
+            <div className="text-center">
+              {orgName && (
+                <p className="text-white font-semibold text-sm">{orgName}</p>
+              )}
+              {eventName && (
+                <p className="text-gray-400 text-sm">{eventName}</p>
+              )}
+              {eventDate && (
+                <p className="text-gray-500 text-xs mt-0.5">{eventDate}</p>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="flex-1 flex items-start lg:items-center justify-center px-6 py-8 bg-gray-50">
           <div className="w-full max-w-sm">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1 mt-4 lg:mt-0">Sign in</h1>
-            <p className="text-gray-500 text-sm mb-6">Sign in to manage your events</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1 mt-4 lg:mt-0">Sign in to complete your waiver</h1>
+            <p className="text-gray-500 text-sm mb-6">
+              Your account lets you view signed waivers and speed up future events.
+            </p>
 
             <button
               onClick={() => signIn("google", { callbackUrl })}
@@ -163,10 +219,19 @@ function SignInForm() {
 
             <p className="text-center text-sm text-gray-500 mt-6">
               Don&apos;t have an account?{" "}
-              <Link href={`/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="text-brand hover:text-brand-hover font-medium">
+              <Link href={`/auth/participant/signup?${signupParams.toString()}`} className="text-brand hover:text-brand-hover font-medium">
                 Sign up
               </Link>
             </p>
+
+            <div className="text-center mt-4 pt-4 border-t border-gray-200">
+              <Link
+                href={guestUrl}
+                className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Continue without an account
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -174,10 +239,10 @@ function SignInForm() {
   );
 }
 
-export default function SignInPage() {
+export default function ParticipantSignInPage() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Loading...</div>}>
-      <SignInForm />
+      <ParticipantSignInForm />
     </Suspense>
   );
 }

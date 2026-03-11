@@ -5,11 +5,14 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { signUp } from "@/lib/actions";
 import Turnstile from "@/components/Turnstile";
 
-function SignInForm() {
+function ParticipantSignUpForm() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,11 +20,38 @@ function SignInForm() {
   const [honeypot, setHoneypot] = useState("");
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const eventName = searchParams.get("eventName") || "";
+  const orgName = searchParams.get("orgName") || "";
+  const eventDate = searchParams.get("eventDate") || "";
 
-  async function handleCredentials(e: React.FormEvent) {
+  // Build guest URL from callbackUrl
+  const guestUrl = callbackUrl.includes("?")
+    ? `${callbackUrl}&guest=true`
+    : `${callbackUrl}?guest=true`;
+
+  // Build participant signin URL preserving all params
+  const signinParams = new URLSearchParams();
+  signinParams.set("callbackUrl", callbackUrl);
+  if (eventName) signinParams.set("eventName", eventName);
+  if (orgName) signinParams.set("orgName", orgName);
+  if (eventDate) signinParams.set("eventDate", eventDate);
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
 
     if (!turnstileToken) {
       setError("Please complete the verification");
@@ -29,23 +59,19 @@ function SignInForm() {
       return;
     }
 
-    if (honeypot) {
-      setError("Sign in failed");
+    const result = await signUp({ name, email, password, turnstileToken, honeypot });
+
+    if (result.error) {
+      setError(result.error);
       setLoading(false);
       return;
     }
 
-    try {
-      await signIn("credentials", {
-        email,
-        password,
-        turnstileToken,
-        callbackUrl,
-      });
-    } catch {
-      setError("Invalid email or password");
-      setLoading(false);
-    }
+    await signIn("credentials", {
+      email,
+      password,
+      callbackUrl,
+    });
   }
 
   return (
@@ -54,23 +80,64 @@ function SignInForm() {
       <div className="hidden lg:flex lg:w-1/2 bg-brand-dark relative overflow-hidden items-center justify-center">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-brand-dark to-gray-900" />
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl" />
+          <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl" />
         </div>
         <div className="relative text-center text-white px-12 max-w-md">
-          <h2 className="text-3xl font-bold mb-3">Welcome back</h2>
-          <p className="text-gray-400 leading-relaxed">
-            Sign in to manage your events, track waivers, and check in attendees.
+          <h2 className="text-3xl font-bold mb-3">
+            Digital Waivers,<br />
+            <span className="bg-gradient-to-r from-brand-500 via-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Simplified
+            </span>
+          </h2>
+          <p className="text-gray-400 leading-relaxed mb-8">
+            Collect digital liability waivers for your events. Manage organizations,
+            check in attendees, and keep everything organized.
           </p>
+
+          {/* Event context */}
+          {(orgName || eventName) && (
+            <div className="bg-white/5 rounded-xl p-5 border border-white/10 text-left">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Signing waiver for</p>
+              {orgName && (
+                <p className="text-white font-bold text-lg">{orgName}</p>
+              )}
+              {eventName && (
+                <p className="text-gray-300 font-medium">{eventName}</p>
+              )}
+              {eventDate && (
+                <p className="text-gray-500 text-sm mt-1">{eventDate}</p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Form panel */}
       <div className="flex-1 flex flex-col">
+        {/* Mobile brand header with event context */}
+        <div className="lg:hidden bg-brand-dark px-6 py-6">
+          {(orgName || eventName) && (
+            <div className="text-center">
+              {orgName && (
+                <p className="text-white font-semibold text-sm">{orgName}</p>
+              )}
+              {eventName && (
+                <p className="text-gray-400 text-sm">{eventName}</p>
+              )}
+              {eventDate && (
+                <p className="text-gray-500 text-xs mt-0.5">{eventDate}</p>
+              )}
+            </div>
+          )}
+        </div>
+
         <div className="flex-1 flex items-start lg:items-center justify-center px-6 py-8 bg-gray-50">
           <div className="w-full max-w-sm">
-            <h1 className="text-2xl font-bold text-gray-900 mb-1 mt-4 lg:mt-0">Sign in</h1>
-            <p className="text-gray-500 text-sm mb-6">Sign in to manage your events</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1 mt-4 lg:mt-0">Create your free account</h1>
+            <p className="text-gray-500 text-sm mb-6">
+              Sign up to complete your waiver, view it later, and speed up future events.
+            </p>
 
             <button
               onClick={() => signIn("google", { callbackUrl })}
@@ -90,14 +157,22 @@ function SignInForm() {
                 <div className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-gray-50 px-3 text-gray-400">or sign in with email</span>
+                <span className="bg-gray-50 px-3 text-gray-400">or create with email</span>
               </div>
             </div>
 
-            <form onSubmit={handleCredentials} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {error && (
                 <div className="text-red-600 text-sm bg-red-50 border border-red-100 p-3 rounded-xl">{error}</div>
               )}
+              <input
+                type="text"
+                placeholder="Full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="w-full border border-gray-200 rounded-xl px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent bg-white"
+              />
               <input
                 type="email"
                 placeholder="Email"
@@ -109,10 +184,11 @@ function SignInForm() {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  placeholder="Password"
+                  placeholder="Password (min 8 characters)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={8}
                   className="w-full border border-gray-200 rounded-xl px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent pr-10 bg-white"
                 />
                 <button
@@ -128,11 +204,15 @@ function SignInForm() {
                   )}
                 </button>
               </div>
-              <div className="text-right -mt-1">
-                <Link href="/auth/forgot-password" className="text-sm text-brand hover:text-brand-hover font-medium">
-                  Forgot password?
-                </Link>
-              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                minLength={8}
+                className="w-full border border-gray-200 rounded-xl px-4 h-11 text-sm focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent bg-white"
+              />
               {/* Honeypot — hidden from real users, bots auto-fill it */}
               <div className="absolute -left-[9999px]" aria-hidden="true">
                 <input
@@ -155,18 +235,27 @@ function SignInForm() {
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                    Signing in...
+                    Creating account...
                   </span>
-                ) : "Sign in"}
+                ) : "Create account"}
               </button>
             </form>
 
             <p className="text-center text-sm text-gray-500 mt-6">
-              Don&apos;t have an account?{" "}
-              <Link href={`/auth/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="text-brand hover:text-brand-hover font-medium">
-                Sign up
+              Already have an account?{" "}
+              <Link href={`/auth/participant/signin?${signinParams.toString()}`} className="text-brand hover:text-brand-hover font-medium">
+                Sign in
               </Link>
             </p>
+
+            <div className="text-center mt-4 pt-4 border-t border-gray-200">
+              <Link
+                href={guestUrl}
+                className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Continue without an account
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -174,10 +263,10 @@ function SignInForm() {
   );
 }
 
-export default function SignInPage() {
+export default function ParticipantSignUpPage() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Loading...</div>}>
-      <SignInForm />
+      <ParticipantSignUpForm />
     </Suspense>
   );
 }

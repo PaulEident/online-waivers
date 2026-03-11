@@ -10,9 +10,10 @@ interface EventWaiverFormProps {
   renderedTemplate: string;
   orgName: string;
   showMailchimpOptIn?: boolean;
+  isGuest?: boolean;
 }
 
-export default function EventWaiverForm({ eventId, renderedTemplate, orgName, showMailchimpOptIn = false }: EventWaiverFormProps) {
+export default function EventWaiverForm({ eventId, renderedTemplate, orgName, showMailchimpOptIn = false, isGuest = false }: EventWaiverFormProps) {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [signatureType, setSignatureType] = useState<"draw" | "type">("draw");
   const [signatureData, setSignatureData] = useState("");
@@ -113,6 +114,23 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {isGuest && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+          <svg className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="text-sm text-amber-800">
+              You&apos;re signing as a guest. You won&apos;t be able to view this waiver later.{" "}
+              <a href="/auth/signup" className="text-brand hover:text-brand-hover font-medium underline">
+                Create a free account
+              </a>{" "}
+              to save your waivers.
+            </p>
+          </div>
+        </div>
+      )}
+
       {errors.length > 0 && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <h3 className="text-sm font-semibold text-red-800 mb-2">Please fix the following errors:</h3>

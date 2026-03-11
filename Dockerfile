@@ -13,7 +13,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN ./node_modules/.bin/prisma generate
 EXPOSE 3000
-CMD ["sh", "-c", "./node_modules/.bin/prisma db push --skip-generate && ./node_modules/.bin/next dev --hostname 0.0.0.0"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma db push --skip-generate --accept-data-loss && ./node_modules/.bin/next dev --hostname 0.0.0.0"]
 
 # ── Build ─────────────────────────────────────────
 FROM base AS build

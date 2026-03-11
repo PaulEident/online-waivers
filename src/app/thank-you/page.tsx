@@ -1,11 +1,12 @@
 import { Suspense } from "react";
 import Link from "next/link";
 
-function ThankYouContent({ searchParams }: { searchParams: { name?: string; count?: string; event?: string; org?: string } }) {
+function ThankYouContent({ searchParams }: { searchParams: { name?: string; count?: string; event?: string; org?: string; guest?: string } }) {
   const name = searchParams.name || "Participant";
   const familyCount = parseInt(searchParams.count || "0");
   const eventName = searchParams.event || "the event";
   const orgName = searchParams.org;
+  const isGuest = searchParams.guest === "true";
 
   return (
     <main className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
@@ -43,12 +44,26 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
             </p>
           </div>
 
-          <Link
-            href="/dashboard"
-            className="inline-block mt-8 text-sm text-brand hover:text-brand-hover underline"
-          >
-            Go to your dashboard
-          </Link>
+          {isGuest ? (
+            <div className="mt-8">
+              <p className="text-sm text-gray-500 mb-3">
+                Create a free account to view your signed waivers and speed up future events.
+              </p>
+              <Link
+                href="/auth/signup"
+                className="inline-block px-8 py-3 bg-brand hover:bg-brand-hover text-white font-semibold rounded-xl shadow-sm hover:shadow-md transition-all text-sm"
+              >
+                Create Free Account
+              </Link>
+            </div>
+          ) : (
+            <Link
+              href="/dashboard"
+              className="inline-block mt-8 text-sm text-brand hover:text-brand-hover underline"
+            >
+              Go to your dashboard
+            </Link>
+          )}
         </div>
 
         {orgName && (
@@ -62,7 +77,7 @@ function ThankYouContent({ searchParams }: { searchParams: { name?: string; coun
 export default async function ThankYouPage({
   searchParams,
 }: {
-  searchParams: Promise<{ name?: string; count?: string; event?: string; org?: string }>;
+  searchParams: Promise<{ name?: string; count?: string; event?: string; org?: string; guest?: string }>;
 }) {
   const params = await searchParams;
   return (

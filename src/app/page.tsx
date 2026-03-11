@@ -17,12 +17,12 @@ const jsonLd = {
     priceCurrency: "USD",
   },
   featureList: [
-    "Digital liability waivers with electronic signatures",
-    "Event check-in management",
-    "Multi-tenant organization support",
-    "Family/minor waiver support",
-    "Unlimited events and waivers",
-    "Role-based access control",
+    "Unlimited organizations, events, and signed waivers",
+    "Customizable waiver templates with electronic signatures",
+    "Shareable event links and auto-generated QR codes",
+    "Organization managers for waiver verification and check-in",
+    "Real-time attendee dashboard with waiver and check-in status",
+    "Works on desktop, tablet, and mobile browsers",
   ],
 };
 
@@ -137,42 +137,81 @@ export default function Home() {
         </p>
 
         <div className="grid md:grid-cols-3 gap-4 md:gap-6">
-          {/* Digital Waivers */}
+          {/* Unlimited Everything */}
           <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div className="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-brand-100 transition-colors">
               <svg className="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Digital Waivers</h3>
+            <h3 className="font-bold text-gray-900 mb-2">Unlimited Everything</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Customizable waiver templates with electronic signatures. Draw or type your signature on any device.
+              Create unlimited organizations for unlimited events with unlimited signed waivers — all for free.
             </p>
           </div>
 
-          {/* Event Check-In */}
+          {/* Custom Waivers */}
+          <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-amber-100 transition-colors">
+              <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </div>
+            <h3 className="font-bold text-gray-900 mb-2">Custom Waivers</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Create a customized liability waiver for your event with a rich text editor. Participants sign electronically on any device.
+            </p>
+          </div>
+
+          {/* Share & QR Codes */}
+          <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-100 transition-colors">
+              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </div>
+            <h3 className="font-bold text-gray-900 mb-2">Share &amp; QR Codes</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Every event gets a unique shareable link and auto-generated QR code — perfect for emails, flyers, and social media.
+            </p>
+          </div>
+
+          {/* Team Management */}
+          <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-100 transition-colors">
+              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <h3 className="font-bold text-gray-900 mb-2">Team Management</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Designate organization managers who can verify waivers are completed and check in participants at the event.
+            </p>
+          </div>
+
+          {/* Attendee Dashboard */}
           <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-100 transition-colors">
               <svg className="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Event Check-In</h3>
+            <h3 className="font-bold text-gray-900 mb-2">Attendee Dashboard</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Search attendees by name, see waiver status, and check them in on arrival.
+              Easily view everyone who signed a waiver and who checked in to your event — all in one place.
             </p>
           </div>
 
-          {/* Multi-Tenant */}
+          {/* Works Everywhere */}
           <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-gray-200 transition-colors">
               <svg className="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Multi-Tenant</h3>
+            <h3 className="font-bold text-gray-900 mb-2">Works Everywhere</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Multiple organizations, each with their own events, members, and waiver templates.
+              Desktop, tablet, or phone — Volntir works on any modern web browser. No app to install.
             </p>
           </div>
         </div>

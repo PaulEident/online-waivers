@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { resetPassword } from "@/lib/actions";
 
@@ -72,13 +71,6 @@ function ResetPasswordForm() {
           <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl" />
         </div>
         <div className="relative text-center text-white px-12 max-w-md">
-          <Image
-            src="/volntir-icon.png"
-            alt=""
-            width={64}
-            height={64}
-            className="mx-auto mb-6 drop-shadow-lg"
-          />
           <h2 className="text-3xl font-bold mb-3">New password</h2>
           <p className="text-gray-400 leading-relaxed">
             Choose a strong password to keep your account secure.
@@ -88,22 +80,8 @@ function ResetPasswordForm() {
 
       {/* Form panel */}
       <div className="flex-1 flex flex-col">
-        <div className="lg:hidden bg-brand-dark px-6 py-6 text-center">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Image src="/volntir-icon.png" alt="" width={32} height={32} priority />
-            <span className="text-xl font-bold text-white">Volntir</span>
-          </Link>
-        </div>
-
         <div className="flex-1 flex items-start lg:items-center justify-center px-6 py-8 bg-gray-50">
           <div className="w-full max-w-sm">
-            <div className="hidden lg:block text-center mb-8">
-              <Link href="/" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
-                <Image src="/volntir-icon.png" alt="" width={32} height={32} priority />
-                <span className="text-xl font-bold text-gray-900">Volntir</span>
-              </Link>
-            </div>
-
             {success ? (
               <div className="text-center">
                 <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">

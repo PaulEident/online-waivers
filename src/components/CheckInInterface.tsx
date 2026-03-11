@@ -6,7 +6,7 @@ import { checkInUser, undoCheckIn } from "@/lib/actions";
 
 interface Attendee {
   waiverId: string;
-  userId: string;
+  userId: string | null;
   firstName: string;
   lastName: string;
   email: string;
@@ -145,9 +145,13 @@ export default function CheckInInterface({
                 </div>
               </div>
               <div>
-                {a.checkedIn ? (
+                {!a.userId ? (
+                  <span className="px-3 py-1.5 bg-amber-100 text-amber-800 font-medium rounded-lg text-xs">
+                    Guest
+                  </span>
+                ) : a.checkedIn ? (
                   <button
-                    onClick={() => handleUndo(a.userId)}
+                    onClick={() => handleUndo(a.userId!)}
                     disabled={loadingId === a.userId}
                     className="px-4 py-2 bg-green-100 text-green-800 font-medium rounded-lg hover:bg-green-200 disabled:opacity-50 transition-colors text-sm"
                   >
@@ -155,7 +159,7 @@ export default function CheckInInterface({
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleCheckIn(a.userId)}
+                    onClick={() => handleCheckIn(a.userId!)}
                     disabled={loadingId === a.userId}
                     className="px-6 py-2 bg-brand text-white font-medium rounded-lg hover:bg-brand-hover disabled:opacity-50 transition-colors"
                   >

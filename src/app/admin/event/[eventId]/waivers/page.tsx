@@ -83,9 +83,13 @@ export default async function EventWaiversPage({
                   return (
                     <tr key={waiver.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
-                        {checkInSet.has(waiver.userId) ? (
+                        {waiver.userId && checkInSet.has(waiver.userId) ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                             Checked In
+                          </span>
+                        ) : !waiver.userId ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                            Guest
                           </span>
                         ) : (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">

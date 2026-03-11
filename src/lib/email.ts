@@ -55,10 +55,12 @@ export async function sendWaiverConfirmationEmail(
   eventName: string,
   orgName: string,
   signedAt: Date,
-  familyMemberCount: number
+  familyMemberCount: number,
+  isGuest: boolean = false
 ) {
   const baseUrl = getBaseUrl();
   const dashboardUrl = `${baseUrl}/dashboard`;
+  const signupUrl = `${baseUrl}/auth/signup`;
   const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
 
   const familyLine = familyMemberCount > 0
@@ -82,19 +84,30 @@ export async function sendWaiverConfirmationEmail(
           <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">Signed on</p>
           <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0;">${signedAt.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
         </div>
+        ${isGuest ? `
+        <div style="background-color: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 8px; padding: 16px; margin: 24px 0; text-align: center;">
+          <p style="color: #9A3412; font-size: 14px; font-weight: 600; margin: 0 0 8px 0;">Want to view your waiver anytime?</p>
+          <a href="${signupUrl}" style="display: inline-block; background-color: #ea580c; color: white; font-weight: 600; font-size: 14px; padding: 10px 24px; border-radius: 8px; text-decoration: none;">
+            Create a Free Account
+          </a>
+        </div>
+        ` : `
         <div style="text-align: center; margin: 32px 0;">
           <a href="${dashboardUrl}" style="display: inline-block; background-color: #ea580c; color: white; font-weight: 600; font-size: 15px; padding: 12px 32px; border-radius: 8px; text-decoration: none;">
             View in Dashboard
           </a>
         </div>
+        `}
         <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5;">
           This is a confirmation that your liability waiver was submitted. Keep this email for your records.
         </p>
+        ${!isGuest ? `
         <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 32px 0;" />
         <p style="color: #9CA3AF; font-size: 12px;">
           If the button doesn't work, copy and paste this URL into your browser:<br />
           <a href="${dashboardUrl}" style="color: #ea580c; word-break: break-all;">${dashboardUrl}</a>
         </p>
+        ` : ""}
       </div>
     `,
   });
