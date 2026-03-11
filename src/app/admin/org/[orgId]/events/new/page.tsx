@@ -71,6 +71,15 @@ export default function NewEventPage() {
             <div>
               <label htmlFor="slug" className="block text-sm font-medium text-gray-700 mb-1">
                 URL Slug *
+                <span className="relative group ml-1 inline-flex">
+                  <svg className="w-3.5 h-3.5 text-gray-400 cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all pointer-events-none z-10">
+                    The URL slug is the web-friendly name used in your event&apos;s shareable link. It&apos;s auto-generated from the event name, but you can customize it.
+                    <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  </span>
+                </span>
               </label>
               <input
                 type="text"
@@ -80,6 +89,11 @@ export default function NewEventPage() {
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-brand"
               />
+              {slug && (
+                <p className="mt-1 text-xs text-gray-400">
+                  yoursite.com/…/<span className="text-gray-600">{slug}</span>
+                </p>
+              )}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>

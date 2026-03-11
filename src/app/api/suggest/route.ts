@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, category, feature, problem } = await req.json();
+    const { name, email, category, feature, problem, willingToPay, monthlyBudget } = await req.json();
 
     if (!name || !email || !category || !feature) {
       return NextResponse.json({ error: "Please fill in all required fields" }, { status: 400 });
@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
         category,
         feature,
         problem: problem || null,
+        willingToPay: willingToPay || null,
+        monthlyBudget: monthlyBudget || null,
       },
     });
 

@@ -5,6 +5,8 @@ import { useState, FormEvent } from "react";
 export default function SuggestFeaturePage() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [willingToPay, setWillingToPay] = useState("");
+  const [monthlyBudget, setMonthlyBudget] = useState("");
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -18,6 +20,8 @@ export default function SuggestFeaturePage() {
       category: (form.elements.namedItem("category") as HTMLSelectElement).value,
       feature: (form.elements.namedItem("feature") as HTMLTextAreaElement).value.trim(),
       problem: (form.elements.namedItem("problem") as HTMLTextAreaElement).value.trim(),
+      willingToPay: willingToPay || null,
+      monthlyBudget: willingToPay === "yes" ? monthlyBudget || null : null,
     };
 
     try {
@@ -34,6 +38,8 @@ export default function SuggestFeaturePage() {
 
       setStatus("sent");
       form.reset();
+      setWillingToPay("");
+      setMonthlyBudget("");
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
       setStatus("error");
@@ -148,6 +154,63 @@ export default function SuggestFeaturePage() {
                 placeholder="Help us understand the use case..."
               />
             </div>
+
+            {/* Willingness to pay */}
+            <fieldset>
+              <legend className="block text-sm font-medium text-gray-700 mb-2">
+                Would a paid plan with this feature interest you?
+              </legend>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { value: "yes", label: "Yes" },
+                  { value: "maybe", label: "Maybe" },
+                  { value: "not_sure", label: "Not sure" },
+                  { value: "no", label: "No" },
+                ].map((opt) => (
+                  <label
+                    key={opt.value}
+                    className={`flex items-center gap-2 px-3 py-2 border rounded-lg text-sm cursor-pointer transition-colors ${
+                      willingToPay === opt.value
+                        ? "border-brand bg-brand-50 text-brand font-medium"
+                        : "border-gray-300 text-gray-700 hover:border-gray-400"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="willingToPay"
+                      value={opt.value}
+                      checked={willingToPay === opt.value}
+                      onChange={(e) => setWillingToPay(e.target.value)}
+                      className="sr-only"
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            {willingToPay === "yes" && (
+              <div>
+                <label htmlFor="monthlyBudget" className="block text-sm font-medium text-gray-700 mb-1">
+                  How much would you be willing to pay each month for this feature?
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-500 text-sm font-medium">$</span>
+                  <input
+                    type="number"
+                    id="monthlyBudget"
+                    name="monthlyBudget"
+                    min="1"
+                    step="1"
+                    value={monthlyBudget}
+                    onChange={(e) => setMonthlyBudget(e.target.value)}
+                    className="w-28 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand/20 focus:border-brand transition-colors"
+                    placeholder="0"
+                  />
+                  <span className="text-gray-500 text-sm">/ month</span>
+                </div>
+              </div>
+            )}
 
             {status === "error" && (
               <div className="bg-red-50 text-red-700 text-sm rounded-lg p-3 border border-red-200">
