@@ -18,8 +18,8 @@ Individual time entries for volunteer hours.
 |-------|------|-------|
 | id | String | @id @default(cuid()) |
 | organizationId | String | FK to Organization |
-| eventId | String? | Optional — for waiver-linked hours |
-| waiverId | String? | Optional — ties back to signed waiver |
+| eventId | String? | Optional — only populated for Flow 4 (waiver-signing hours) |
+| waiverId | String? | Optional — only populated for Flow 4 (waiver-signing hours), links to the specific waiver that generated the entry |
 | userId | String? | Optional — for authenticated volunteers |
 | volunteerEmail | String | Always populated, used for guest lookup |
 | volunteerName | String | Display name |
@@ -46,6 +46,8 @@ Per-organization settings for the time tracking feature.
 | autoExpireHours | Int | Default 12 |
 | requireApproval | Boolean | Default true |
 | enabled | Boolean | Default true |
+| createdAt | DateTime | @default(now()) |
+| updatedAt | DateTime | @updatedAt |
 
 ### TimeLogStatus Enum
 
@@ -87,6 +89,7 @@ Per-organization settings for the time tracking feature.
 
 **`/admin/org/[orgId]/volunteer-hours`** — Review and manage time logs.
 
+- Linked from the existing org admin navigation (add a "Volunteer Hours" link alongside Events, Members, Settings)
 - Filterable by: status (pending/approved/disputed/expired), date range, volunteer name
 - Each entry shows: volunteer name, date, clock in/out times, total hours, manual vs. clocked indicator
 - Actions: approve, dispute (with note), bulk approve
@@ -134,9 +137,10 @@ Per-organization settings for the time tracking feature.
 
 1. Volunteer checks `isVolunteer` and enters hours on the waiver form
 2. On waiver submission, a `VolunteerTimeLog` is also created
-3. Linked to the event and waiver
-4. Status set to PENDING (goes through same admin approval flow)
-5. Unifies reporting — all hours visible in the admin dashboard
+3. Linked to the event and waiver via `eventId` and `waiverId`
+4. `clockIn` is set to the event date (or waiver `signedAt` if no event date); `clockOut` is set to `clockIn` + reported hours. `isManualEntry = true` since these are self-reported, not real-time
+5. Status set to PENDING (goes through same admin approval flow)
+6. Unifies reporting — all hours visible in the admin dashboard
 
 ### Flow 5: Admin Review
 
@@ -161,12 +165,13 @@ Per-organization settings for the time tracking feature.
 - **Body:** volunteer name, date, hours, manual vs. clocked, direct link to review dashboard
 - **Batching:** if a parent clocks out multiple family members, one email with all entries (not separate emails)
 
-### Expired Session Notification (on auto-expire)
+### Expired Session Notification (future — requires cron job)
 
-- **To:** org admins only
-- **Subject:** "Expired volunteer session — [Org Name]"
-- **Body:** volunteer name, clock-in time, auto-expired note, link to dashboard
-- No notification to volunteer (they see it on next visit)
+Deferred to post-launch. Since auto-expire is on-demand only (triggered by page visits), there's no reliable moment to send this email without a cron job. Admins can see expired entries in the dashboard for now.
+
+### Email Implementation Note
+
+All email templates follow the existing pattern in `src/lib/email.ts`: inline HTML with Resend, using `getBaseUrl()` for links and the shared `fromEmail` constant.
 
 ## Edge Cases
 
@@ -175,14 +180,14 @@ Per-organization settings for the time tracking feature.
 - **Clock out before clock in** — Server action validates clockOut > clockIn
 - **Manual entry overlap** — Allowed; admin approval is the quality gate
 - **Time tracking disabled** — Public page shows "not available" message
-- **Multiple waivers across events** — Email lookup returns all family members across all waivers for that org, deduplicated by name
-- **Waiver expired or org deleted** — Lookup checks for active waivers in active orgs only
+- **Multiple waivers across events** — Email lookup returns all family members across all waivers for that org, deduplicated by exact `firstName + lastName` match (case-insensitive). Minor name variations across waivers may result in duplicates; admin can resolve via the dashboard
+- **Org deleted** — Lookup only matches organizations that exist. There is no waiver expiration concept in the current schema; any signed waiver qualifies the volunteer for time tracking
 
 ## Server Actions
 
 New actions in `lib/actions.ts` (following existing patterns):
 
-- `lookupVolunteerByEmail(orgSlug, email)` — find waivers + family members
+- `lookupVolunteerByEmail(orgId, email)` — find waivers + family members (slug-to-ID resolution happens at the page level, consistent with existing action patterns)
 - `clockIn(orgId, entries[])` — create time log entries
 - `clockOut(timeLogId)` — set clockOut + compute totalMinutes
 - `resolveExpiredSession(timeLogId, actualEndTime)` — fix forgotten clock-out
