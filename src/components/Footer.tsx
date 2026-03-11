@@ -53,9 +53,6 @@ export default function Footer() {
           <p className="text-xs text-gray-500">
             &copy; {new Date().getFullYear()} Volntir. All rights reserved.
           </p>
-          <p className="text-xs text-gray-600">
-            Volunteering, Together
-          </p>
         </div>
       </div>
     </footer>

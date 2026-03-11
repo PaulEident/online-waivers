@@ -1,6 +1,7 @@
 import { requireEventAccess, getEvent, getEventWaivers, getEventCheckIns } from "@/lib/actions";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import VolunteerHoursEditor from "@/components/VolunteerHoursEditor";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ export default async function EventWaiversPage({
   const waivers = await getEventWaivers(eventId, search);
   const checkIns = await getEventCheckIns(eventId);
   const checkInSet = new Set(checkIns.map((c) => c.user.id));
+  const hasVolunteers = waivers.some((w) => w.isVolunteer);
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -66,6 +68,9 @@ export default async function EventWaiversPage({
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Name</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 hidden sm:table-cell">Email</th>
                 <th className="px-4 py-3 text-center font-semibold text-gray-600">Family</th>
+                {hasVolunteers && (
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600 hidden md:table-cell">Volunteer Hours</th>
+                )}
                 <th className="px-4 py-3 text-left font-semibold text-gray-600 hidden md:table-cell">Signed</th>
                 <th className="px-4 py-3 text-center font-semibold text-gray-600">Details</th>
               </tr>
@@ -73,7 +78,7 @@ export default async function EventWaiversPage({
             <tbody className="divide-y divide-gray-100">
               {waivers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan={hasVolunteers ? 7 : 6} className="px-4 py-8 text-center text-gray-500">
                     {search ? "No waivers found matching your search." : "No waivers signed yet."}
                   </td>
                 </tr>
@@ -83,19 +88,26 @@ export default async function EventWaiversPage({
                   return (
                     <tr key={waiver.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
-                        {waiver.userId && checkInSet.has(waiver.userId) ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            Checked In
-                          </span>
-                        ) : !waiver.userId ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-                            Guest
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                            Signed
-                          </span>
-                        )}
+                        <div className="flex flex-wrap gap-1">
+                          {waiver.userId && checkInSet.has(waiver.userId) ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              Checked In
+                            </span>
+                          ) : !waiver.userId ? (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                              Guest
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                              Signed
+                            </span>
+                          )}
+                          {waiver.isVolunteer && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                              Volunteer
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">
@@ -112,6 +124,19 @@ export default async function EventWaiversPage({
                           <span className="text-gray-400">—</span>
                         )}
                       </td>
+                      {hasVolunteers && (
+                        <td className="px-4 py-3 hidden md:table-cell">
+                          {waiver.isVolunteer ? (
+                            <VolunteerHoursEditor
+                              waiverId={waiver.id}
+                              reportedHours={waiver.volunteerHours ? Number(waiver.volunteerHours) : null}
+                              verifiedHours={waiver.verifiedHours ? Number(waiver.verifiedHours) : null}
+                            />
+                          ) : (
+                            <span className="text-gray-400">—</span>
+                          )}
+                        </td>
+                      )}
                       <td className="px-4 py-3 text-gray-500 text-xs hidden md:table-cell">
                         {new Date(waiver.createdAt).toLocaleString()}
                       </td>

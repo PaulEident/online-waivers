@@ -129,6 +129,50 @@ export default async function WaiverDetailPage({
           </div>
         )}
 
+        {/* Volunteer Information */}
+        {waiver.isVolunteer && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center gap-2 mb-4 border-b border-gray-200 pb-2">
+              <h2 className="text-lg font-bold text-gray-900">Volunteer Information</h2>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                Volunteer
+              </span>
+            </div>
+            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <dt className="text-xs text-gray-500">Reported Hours</dt>
+                <dd className="text-sm font-medium text-gray-900">
+                  {waiver.volunteerHours ? `${Number(waiver.volunteerHours)} hours` : "Not specified"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs text-gray-500">Verified Hours</dt>
+                <dd className="text-sm font-medium text-gray-900">
+                  {waiver.verifiedHours ? (
+                    <span className="text-teal-700">{Number(waiver.verifiedHours)} hours</span>
+                  ) : (
+                    <span className="text-amber-600">Not yet verified</span>
+                  )}
+                </dd>
+              </div>
+              {waiver.hoursVerifiedAt && (
+                <>
+                  <div>
+                    <dt className="text-xs text-gray-500">Verified At</dt>
+                    <dd className="text-sm font-medium text-gray-900">
+                      {new Date(waiver.hoursVerifiedAt).toLocaleString()}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs text-gray-500">Verified By</dt>
+                    <dd className="text-sm font-medium text-gray-900">{waiver.hoursVerifiedBy || "—"}</dd>
+                  </div>
+                </>
+              )}
+            </dl>
+          </div>
+        )}
+
         {/* Signature */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">

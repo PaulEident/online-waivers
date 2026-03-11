@@ -60,10 +60,6 @@ export default function Home() {
             <span className="text-3xl md:text-4xl font-bold tracking-tight">Volntir</span>
           </div>
 
-          <p className="text-brand-500 text-xs md:text-sm font-semibold uppercase tracking-[0.2em] mb-6">
-            Volunteering, Together
-          </p>
-
           <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
             Digital Waivers,<br />
             <span className="bg-gradient-to-r from-brand-500 via-orange-400 to-amber-400 bg-clip-text text-transparent">
@@ -212,6 +208,19 @@ export default function Home() {
             <h3 className="font-bold text-gray-900 mb-2">Works Everywhere</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
               Desktop, tablet, or phone — Volntir works on any modern web browser. No app to install.
+            </p>
+          </div>
+
+          {/* Volunteer Hours Tracking */}
+          <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-teal-100 transition-colors">
+              <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="font-bold text-gray-900 mb-2">Volunteer Hours Tracking</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Participants can log volunteer hours when signing a waiver. Organization admins verify and approve hours — perfect for tracking community service.
             </p>
           </div>
         </div>

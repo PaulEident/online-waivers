@@ -7,6 +7,9 @@ export default async function DashboardPage() {
   const user = await requireAuth();
   const waivers = await getUserWaivers();
   const orgs = await getUserOrgs();
+  const totalVolunteerHours = waivers
+    .filter((w) => w.isVolunteer)
+    .reduce((sum, w) => sum + (w.verifiedHours ? Number(w.verifiedHours) : w.volunteerHours ? Number(w.volunteerHours) : 0), 0);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -69,6 +72,22 @@ export default async function DashboardPage() {
           </div>
         </div>
 
+        {/* Volunteer Hours Summary */}
+        {waivers.some((w) => w.isVolunteer) && (
+          <div className="bg-white rounded-xl border border-gray-200/80 shadow-sm p-5 border-l-4 border-l-teal-500">
+            <div className="flex items-center gap-2 mb-2">
+              <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h2 className="text-base font-bold text-gray-900">Volunteer Hours</h2>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-bold text-teal-700">{totalVolunteerHours}</span>
+              <span className="text-sm text-gray-500">total hours across {waivers.filter((w) => w.isVolunteer).length} event{waivers.filter((w) => w.isVolunteer).length !== 1 ? "s" : ""}</span>
+            </div>
+          </div>
+        )}
+
         {/* My Waivers */}
         <div className="bg-white rounded-xl border border-gray-200/80 shadow-sm p-5 border-l-4 border-l-accent">
           <div className="flex items-center gap-2 mb-4">
@@ -102,10 +121,26 @@ export default async function DashboardPage() {
                       Signed {new Date(waiver.createdAt).toLocaleDateString()}
                     </div>
                   </div>
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200/60">
-                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                    Signed
-                  </span>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200/60">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      Signed
+                    </span>
+                    {waiver.isVolunteer && (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-teal-50 text-teal-700 border border-teal-200/60">
+                        {waiver.verifiedHours ? (
+                          <>
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                            {Number(waiver.verifiedHours)}h verified
+                          </>
+                        ) : waiver.volunteerHours ? (
+                          <>{Number(waiver.volunteerHours)}h reported</>
+                        ) : (
+                          <>Volunteer</>
+                        )}
+                      </span>
+                    )}
+                  </div>
                 </Link>
               ))}
             </div>

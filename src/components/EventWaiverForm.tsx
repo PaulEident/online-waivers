@@ -19,6 +19,8 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
   const [signatureData, setSignatureData] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [mailchimpOptIn, setMailchimpOptIn] = useState(false);
+  const [isVolunteer, setIsVolunteer] = useState(false);
+  const [volunteerHours, setVolunteerHours] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -97,6 +99,8 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
         signatureType,
         signatureData,
         mailchimpOptIn,
+        isVolunteer,
+        volunteerHours: isVolunteer && volunteerHours ? parseFloat(volunteerHours) : undefined,
         familyMembers: familyMembers.map((fm) => ({
           firstName: fm.firstName.trim(),
           lastName: fm.lastName.trim(),
@@ -249,6 +253,46 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
       <section className="space-y-4">
         <h2 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">Signature</h2>
         <SignaturePad onSignatureChange={handleSignatureChange} />
+      </section>
+
+      {/* Volunteer */}
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold text-gray-900 border-b border-gray-200 pb-2">Volunteering</h2>
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            id="isVolunteer"
+            checked={isVolunteer}
+            onChange={(e) => setIsVolunteer(e.target.checked)}
+            className="mt-1 h-5 w-5 text-brand border-gray-300 rounded focus:ring-brand"
+          />
+          <label htmlFor="isVolunteer" className="text-sm text-gray-700">
+            <span className="font-semibold">I&apos;m volunteering for this event</span>
+            <br />
+            <span className="text-gray-500">Check this if you are volunteering, so we can track your hours.</span>
+          </label>
+        </div>
+        {isVolunteer && (
+          <div className="ml-8">
+            <label htmlFor="volunteerHours" className="block text-sm font-semibold text-gray-700 mb-1">
+              Expected Volunteer Hours
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                id="volunteerHours"
+                min="0.5"
+                step="0.5"
+                value={volunteerHours}
+                onChange={(e) => setVolunteerHours(e.target.value)}
+                className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-brand"
+                placeholder="0"
+              />
+              <span className="text-sm text-gray-500">hours</span>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Your hours will be verified by the event organizer.</p>
+          </div>
+        )}
       </section>
 
       {/* Mailchimp Opt-in */}

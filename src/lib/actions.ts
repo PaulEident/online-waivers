@@ -471,6 +471,8 @@ interface WaiverInput {
   signatureType: "draw" | "type";
   signatureData: string;
   mailchimpOptIn: boolean;
+  isVolunteer: boolean;
+  volunteerHours?: number;
   familyMembers: { firstName: string; lastName: string; age: number }[];
 }
 
@@ -514,6 +516,8 @@ export async function submitWaiver(data: WaiverInput) {
       signatureType: data.signatureType,
       signatureData: data.signatureData,
       mailchimpOptIn: data.mailchimpOptIn,
+      isVolunteer: data.isVolunteer,
+      volunteerHours: data.isVolunteer && data.volunteerHours ? data.volunteerHours : null,
       familyMembers: data.familyMembers.length > 0 ? data.familyMembers : undefined,
     },
   });
@@ -633,6 +637,31 @@ export async function getWaiver(id: string) {
   }
 
   return waiver;
+}
+
+export async function verifyVolunteerHours(waiverId: string, hours: number) {
+  const user = await requireAuth();
+
+  const waiver = await prisma.waiver.findUnique({
+    where: { id: waiverId },
+    select: { eventId: true, isVolunteer: true },
+  });
+  if (!waiver) return { error: "Waiver not found" };
+  if (!waiver.isVolunteer) return { error: "This waiver is not marked as volunteer" };
+
+  await requireEventAccess(waiver.eventId);
+
+  await prisma.waiver.update({
+    where: { id: waiverId },
+    data: {
+      verifiedHours: hours,
+      hoursVerifiedAt: new Date(),
+      hoursVerifiedBy: user.id,
+    },
+  });
+
+  revalidatePath(`/admin/event/${waiver.eventId}/waivers`);
+  return { success: true };
 }
 
 export async function getUserWaivers() {
