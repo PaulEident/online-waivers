@@ -39,6 +39,12 @@ enum TimeLogStatus {
   EXPIRED
 }
 
+enum SlotSignupStatus {
+  CONFIRMED
+  WAITLISTED
+  CANCELLED
+}
+
 // ──────────────────────────────────────────
 // Auth (NextAuth.js v5)
 // ──────────────────────────────────────────
@@ -52,6 +58,7 @@ model User {
   password      String?
   bio           String?   @db.Text
   role          UserRole  @default(USER)
+  marketingOptIn Boolean?
 
   accounts       Account[]
   sessions       Session[]
@@ -154,6 +161,7 @@ model Event {
   checkIns CheckIn[]
   managers EventManager[]
   volunteerTimeLogs VolunteerTimeLog[]
+  volunteerShifts   VolunteerShift[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -312,4 +320,63 @@ model FeatureRequest {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ──────────────────────────────────────────
+// Volunteer Shift Scheduling
+// ──────────────────────────────────────────
+
+model VolunteerShift {
+  id                   String   @id @default(cuid())
+  eventId              String
+  title                String
+  description          String?  @db.Text
+  startTime            DateTime
+  endTime              DateTime
+  slotDurationMinutes  Int
+  defaultMaxVolunteers Int
+
+  event Event            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  slots VolunteerSlot[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+}
+
+model VolunteerSlot {
+  id            String   @id @default(cuid())
+  shiftId       String
+  startTime     DateTime
+  endTime       DateTime
+  maxVolunteers Int
+
+  shift   VolunteerShift       @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  signups VolunteerSlotSignup[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shiftId])
+}
+
+model VolunteerSlotSignup {
+  id               String           @id @default(cuid())
+  slotId           String
+  volunteerEmail   String
+  volunteerName    String
+  familyMemberName String           @default("")
+  status           SlotSignupStatus
+  waitlistPosition Int?
+  cancelledAt      DateTime?
+
+  slot VolunteerSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([slotId, volunteerEmail, familyMemberName])
+  @@index([volunteerEmail])
+  @@index([slotId, status])
 }

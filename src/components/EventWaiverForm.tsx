@@ -11,14 +11,16 @@ interface EventWaiverFormProps {
   orgName: string;
   showMailchimpOptIn?: boolean;
   isGuest?: boolean;
+  showVolntirOptIn?: boolean;
 }
 
-export default function EventWaiverForm({ eventId, renderedTemplate, orgName, showMailchimpOptIn = false, isGuest = false }: EventWaiverFormProps) {
+export default function EventWaiverForm({ eventId, renderedTemplate, orgName, showMailchimpOptIn = false, isGuest = false, showVolntirOptIn = false }: EventWaiverFormProps) {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [signatureType, setSignatureType] = useState<"draw" | "type">("draw");
   const [signatureData, setSignatureData] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [mailchimpOptIn, setMailchimpOptIn] = useState(false);
+  const [volntirMarketingOptIn, setVolntirMarketingOptIn] = useState(true);
   const [isVolunteer, setIsVolunteer] = useState(false);
   const [volunteerHours, setVolunteerHours] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -101,6 +103,7 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
         mailchimpOptIn,
         isVolunteer,
         volunteerHours: isVolunteer && volunteerHours ? parseFloat(volunteerHours) : undefined,
+        volntirMarketingOptIn: showVolntirOptIn ? volntirMarketingOptIn : undefined,
         familyMembers: familyMembers.map((fm) => ({
           firstName: fm.firstName.trim(),
           lastName: fm.lastName.trim(),
@@ -310,6 +313,26 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
               <span className="font-semibold">Join the {orgName} mailing list</span>
               <br />
               <span className="text-gray-500">Stay updated on events and volunteer opportunities.</span>
+            </label>
+          </div>
+        </section>
+      )}
+
+      {/* Volntir Marketing Opt-in */}
+      {showVolntirOptIn && (
+        <section>
+          <div className="flex items-start gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+            <input
+              type="checkbox"
+              id="volntirMarketingOptIn"
+              checked={volntirMarketingOptIn}
+              onChange={(e) => setVolntirMarketingOptIn(e.target.checked)}
+              className="mt-1 h-5 w-5 text-brand border-gray-300 rounded focus:ring-brand"
+            />
+            <label htmlFor="volntirMarketingOptIn" className="text-sm text-gray-700">
+              <span className="font-semibold">Get occasional updates from Volntir</span>
+              <br />
+              <span className="text-gray-500">New features and volunteer opportunities. We email infrequently and never share your information.</span>
             </label>
           </div>
         </section>

@@ -72,6 +72,7 @@ export async function signUp(data: {
   password: string;
   turnstileToken: string;
   honeypot?: string;
+  marketingOptIn?: boolean;
 }) {
   // Bot protection: reject if honeypot was filled
   if (data.honeypot) return { error: "Signup failed" };
@@ -90,7 +91,17 @@ export async function signUp(data: {
       name: data.name,
       email: data.email,
       password: hashedPassword,
+      marketingOptIn: data.marketingOptIn ?? false,
     },
+  });
+  return { success: true };
+}
+
+export async function setMarketingOptIn(optIn: boolean) {
+  const user = await requireAuth();
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { marketingOptIn: optIn },
   });
   return { success: true };
 }
@@ -474,6 +485,7 @@ interface WaiverInput {
   isVolunteer: boolean;
   volunteerHours?: number;
   familyMembers: { firstName: string; lastName: string; age: number }[];
+  volntirMarketingOptIn?: boolean;
 }
 
 export async function submitWaiver(data: WaiverInput) {
@@ -570,6 +582,18 @@ export async function submitWaiver(data: WaiverInput) {
       await subscribeToMailchimp(data.email, data.firstName, data.lastName);
     } catch (error) {
       console.error("Mailchimp subscribe error:", error);
+    }
+  }
+
+  // Update Volntir marketing opt-in for authenticated users
+  if (data.volntirMarketingOptIn && userId) {
+    try {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { marketingOptIn: true },
+      });
+    } catch (error) {
+      console.error("Marketing opt-in update error:", error);
     }
   }
 

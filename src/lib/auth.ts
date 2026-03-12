@@ -14,11 +14,13 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       role: string;
+      needsWelcome?: boolean;
     };
   }
   interface JWT {
     id?: string;
     role?: string;
+    needsWelcome?: boolean;
   }
 }
 
@@ -83,13 +85,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // This runs in Node.js runtime (not Edge) during sign-in
       if (user) {
         token.id = user.id;
-        // Fetch role at sign-in time (safe: runs in Node.js)
+        // Fetch role and marketing status at sign-in time (safe: runs in Node.js)
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: user.id as string },
-            select: { role: true },
+            select: { role: true, marketingOptIn: true },
           });
           token.role = dbUser?.role || "USER";
+          token.needsWelcome = dbUser?.marketingOptIn === null;
         } catch {
           // Edge runtime - can't use Prisma, use cached role
           token.role = "USER";
@@ -101,11 +104,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { role: true, image: true, name: true },
+            select: { role: true, image: true, name: true, marketingOptIn: true },
           });
           token.role = dbUser?.role || "USER";
           token.picture = dbUser?.image;
           token.name = dbUser?.name;
+          token.needsWelcome = dbUser?.marketingOptIn === null;
         } catch {
           // Edge runtime fallback
         }
@@ -117,6 +121,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user && token.id) {
         session.user.id = token.id as string;
         session.user.role = (token.role as string) || "USER";
+        session.user.needsWelcome = !!token.needsWelcome;
       }
       return session;
     },

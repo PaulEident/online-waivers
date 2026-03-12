@@ -1,11 +1,22 @@
 import { requireAuth, getUserWaivers, getUserOrgs } from "@/lib/actions";
 import { getVolunteerDashboard } from "@/lib/volunteer-actions";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
   const user = await requireAuth();
+
+  // Redirect new OAuth users to welcome page for marketing opt-in
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { marketingOptIn: true },
+  });
+  if (dbUser?.marketingOptIn === null) {
+    redirect("/auth/welcome?callbackUrl=/dashboard");
+  }
   const waivers = await getUserWaivers();
   const orgs = await getUserOrgs();
   const volunteerData = await getVolunteerDashboard();

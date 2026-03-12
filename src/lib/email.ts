@@ -162,6 +162,188 @@ export async function sendAdminVolunteerNotificationEmail(
   });
 }
 
+// ──────────────────────────────────────────
+// Volunteer Shift Emails
+// ──────────────────────────────────────────
+
+function formatSlotTime(start: Date, end: Date): string {
+  const dateStr = start.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+  const startTime = start.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const endTime = end.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  return `${dateStr}, ${startTime} — ${endTime}`;
+}
+
+export async function sendShiftSignupConfirmationEmail(
+  email: string,
+  volunteerName: string,
+  shiftTitle: string,
+  eventName: string,
+  orgName: string,
+  slotStart: Date,
+  slotEnd: Date,
+  orgSlug: string
+) {
+  const baseUrl = getBaseUrl();
+  const volunteerUrl = `${baseUrl}/volunteer/${orgSlug}`;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
+
+  await resend.emails.send({
+    from: `Volntir <${fromEmail}>`,
+    to: email,
+    subject: `Shift confirmed: ${shiftTitle} — ${eventName}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">You're Confirmed!</h1>
+        </div>
+        <p style="color: #4B5563; font-size: 15px; line-height: 1.6;">
+          Hi ${volunteerName}, you're signed up for a shift at <strong>${eventName}</strong> hosted by <strong>${orgName}</strong>.
+        </p>
+        <div style="background-color: #F3F4F6; border-radius: 8px; padding: 16px; margin: 24px 0;">
+          <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">Shift</p>
+          <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0 0 12px 0;">${shiftTitle}</p>
+          <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">When</p>
+          <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0;">${formatSlotTime(slotStart, slotEnd)}</p>
+        </div>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${volunteerUrl}" style="display: inline-block; background-color: #ea580c; color: white; font-weight: 600; font-size: 15px; padding: 12px 32px; border-radius: 8px; text-decoration: none;">
+            View My Shifts
+          </a>
+        </div>
+        <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5;">
+          You can manage your shifts at any time by visiting the volunteer page.
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendWaitlistNotificationEmail(
+  email: string,
+  volunteerName: string,
+  shiftTitle: string,
+  eventName: string,
+  orgName: string,
+  slotStart: Date,
+  slotEnd: Date,
+  orgSlug: string
+) {
+  const baseUrl = getBaseUrl();
+  const volunteerUrl = `${baseUrl}/volunteer/${orgSlug}`;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
+
+  await resend.emails.send({
+    from: `Volntir <${fromEmail}>`,
+    to: email,
+    subject: `Waitlisted: ${shiftTitle} — ${eventName}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">You're on the Waitlist</h1>
+        </div>
+        <p style="color: #4B5563; font-size: 15px; line-height: 1.6;">
+          Hi ${volunteerName}, the shift is currently full, but you've been added to the waitlist for <strong>${eventName}</strong> hosted by <strong>${orgName}</strong>. We'll notify you if a spot opens up.
+        </p>
+        <div style="background-color: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 8px; padding: 16px; margin: 24px 0;">
+          <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">Shift</p>
+          <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0 0 12px 0;">${shiftTitle}</p>
+          <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">When</p>
+          <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0;">${formatSlotTime(slotStart, slotEnd)}</p>
+        </div>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${volunteerUrl}" style="display: inline-block; background-color: #ea580c; color: white; font-weight: 600; font-size: 15px; padding: 12px 32px; border-radius: 8px; text-decoration: none;">
+            View My Shifts
+          </a>
+        </div>
+      </div>
+    `,
+  });
+}
+
+export async function sendWaitlistPromotionEmail(
+  email: string,
+  volunteerName: string,
+  shiftTitle: string,
+  eventName: string,
+  orgName: string,
+  slotStart: Date,
+  slotEnd: Date,
+  orgSlug: string
+) {
+  const baseUrl = getBaseUrl();
+  const volunteerUrl = `${baseUrl}/volunteer/${orgSlug}`;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
+
+  await resend.emails.send({
+    from: `Volntir <${fromEmail}>`,
+    to: email,
+    subject: `You're in! ${shiftTitle} — ${eventName}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">A Spot Opened Up!</h1>
+        </div>
+        <p style="color: #4B5563; font-size: 15px; line-height: 1.6;">
+          Great news, ${volunteerName}! A spot opened up and you've been confirmed for a shift at <strong>${eventName}</strong> hosted by <strong>${orgName}</strong>.
+        </p>
+        <div style="background-color: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 16px; margin: 24px 0;">
+          <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">Shift</p>
+          <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0 0 12px 0;">${shiftTitle}</p>
+          <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">When</p>
+          <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0;">${formatSlotTime(slotStart, slotEnd)}</p>
+        </div>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${volunteerUrl}" style="display: inline-block; background-color: #ea580c; color: white; font-weight: 600; font-size: 15px; padding: 12px 32px; border-radius: 8px; text-decoration: none;">
+            View My Shifts
+          </a>
+        </div>
+      </div>
+    `,
+  });
+}
+
+export async function sendShiftCancellationEmail(
+  email: string,
+  volunteerName: string,
+  shiftTitle: string,
+  eventName: string,
+  orgName: string,
+  slotStart: Date,
+  slotEnd: Date,
+  orgSlug: string
+) {
+  const baseUrl = getBaseUrl();
+  const volunteerUrl = `${baseUrl}/volunteer/${orgSlug}`;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
+
+  await resend.emails.send({
+    from: `Volntir <${fromEmail}>`,
+    to: email,
+    subject: `Shift cancelled: ${shiftTitle} — ${eventName}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">Shift Cancelled</h1>
+        </div>
+        <p style="color: #4B5563; font-size: 15px; line-height: 1.6;">
+          Hi ${volunteerName}, a shift you were signed up for at <strong>${eventName}</strong> hosted by <strong>${orgName}</strong> has been cancelled by the organizer.
+        </p>
+        <div style="background-color: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 16px; margin: 24px 0;">
+          <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">Shift</p>
+          <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0 0 12px 0;">${shiftTitle}</p>
+          <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">Was scheduled for</p>
+          <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0;">${formatSlotTime(slotStart, slotEnd)}</p>
+        </div>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${volunteerUrl}" style="display: inline-block; background-color: #ea580c; color: white; font-weight: 600; font-size: 15px; padding: 12px 32px; border-radius: 8px; text-decoration: none;">
+            Browse Available Shifts
+          </a>
+        </div>
+      </div>
+    `,
+  });
+}
+
 export async function sendWaiverConfirmationEmail(
   email: string,
   firstName: string,

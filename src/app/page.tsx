@@ -22,6 +22,8 @@ const jsonLd = {
     "Shareable event links and auto-generated QR codes",
     "Organization managers for waiver verification and check-in",
     "Real-time attendee dashboard with waiver and check-in status",
+    "Volunteer shift signups with time slots and waitlists",
+    "Volunteer hours tracking with admin approval",
     "Works on desktop, tablet, and mobile browsers",
   ],
 };
@@ -61,15 +63,15 @@ export default function Home() {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-            Digital Waivers,<br />
+            Event Management,<br />
             <span className="bg-gradient-to-r from-brand-500 via-orange-400 to-amber-400 bg-clip-text text-transparent">
               Simplified
             </span>
           </h1>
 
           <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto mb-8 leading-relaxed">
-            Collect digital liability waivers for your events. Manage organizations,
-            check in attendees, and keep everything organized.
+            Collect digital waivers, manage volunteer shift signups, and track hours
+            — all in one free platform for events and organizations.
           </p>
 
           {/* FREE callout */}
@@ -129,7 +131,7 @@ export default function Home() {
           Everything you need
         </h2>
         <p className="text-center text-gray-500 mb-12 md:mb-16 max-w-lg mx-auto">
-          From waiver signing to event check-in, Volntir handles the paperwork so you can focus on what matters.
+          From waivers and check-ins to volunteer signups and hour tracking — Volntir handles it all so you can focus on what matters.
         </p>
 
         <div className="grid md:grid-cols-3 gap-4 md:gap-6">
@@ -211,6 +213,19 @@ export default function Home() {
             </p>
           </div>
 
+          {/* Shift Signups */}
+          <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-rose-100 transition-colors">
+              <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="font-bold text-gray-900 mb-2">Shift Signups</h3>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Create volunteer shifts with time slots for your events. Volunteers browse, sign up, and join waitlists — with family member support built in.
+            </p>
+          </div>
+
           {/* Volunteer Hours Tracking */}
           <div className="group p-6 rounded-2xl border border-gray-200/80 bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <div className="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-teal-100 transition-colors">
@@ -220,7 +235,7 @@ export default function Home() {
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Volunteer Hours Tracking</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Participants can log volunteer hours when signing a waiver. Organization admins verify and approve hours — perfect for tracking community service.
+              Volunteers clock in and out or log past hours. Admins review and approve — perfect for tracking community service and court-ordered hours.
             </p>
           </div>
         </div>

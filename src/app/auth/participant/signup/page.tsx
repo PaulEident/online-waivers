@@ -18,6 +18,7 @@ function ParticipantSignUpForm() {
   const [loading, setLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [honeypot, setHoneypot] = useState("");
+  const [marketingOptIn, setMarketingOptIn] = useState(true);
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const eventName = searchParams.get("eventName") || "";
@@ -59,7 +60,7 @@ function ParticipantSignUpForm() {
       return;
     }
 
-    const result = await signUp({ name, email, password, turnstileToken, honeypot });
+    const result = await signUp({ name, email, password, turnstileToken, honeypot, marketingOptIn });
 
     if (result.error) {
       setError(result.error);
@@ -226,6 +227,18 @@ function ParticipantSignUpForm() {
               </div>
 
               <Turnstile onVerify={setTurnstileToken} />
+
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={marketingOptIn}
+                  onChange={(e) => setMarketingOptIn(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 text-brand border-gray-300 rounded focus:ring-brand"
+                />
+                <span className="text-xs text-gray-500 leading-relaxed">
+                  Send me occasional updates about new features and volunteer opportunities. We email infrequently and never share your information with third parties.
+                </span>
+              </label>
 
               <button
                 type="submit"

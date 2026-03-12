@@ -27,10 +27,19 @@ export default async function EventWaiverPage({
 
   // Check if authenticated user already signed waiver for this event
   let existingWaiver = null;
+  let userMarketingOptIn: boolean | null = null;
   if (user) {
-    existingWaiver = await prisma.waiver.findUnique({
-      where: { userId_eventId: { userId: user.id, eventId: event.id } },
-    });
+    const [waiver, dbUser] = await Promise.all([
+      prisma.waiver.findUnique({
+        where: { userId_eventId: { userId: user.id, eventId: event.id } },
+      }),
+      prisma.user.findUnique({
+        where: { id: user.id },
+        select: { marketingOptIn: true },
+      }),
+    ]);
+    existingWaiver = waiver;
+    userMarketingOptIn = dbUser?.marketingOptIn ?? null;
   }
 
   // Use event-level template, fall back to org template for legacy events
@@ -161,6 +170,7 @@ export default async function EventWaiverPage({
               orgName={event.org.name}
               showMailchimpOptIn={event.org.mailchimpEnabled}
               isGuest={isGuest}
+              showVolntirOptIn={!!user && userMarketingOptIn !== true}
             />
           </div>
         )}

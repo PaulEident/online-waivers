@@ -8,6 +8,8 @@ import {
   resolveExpiredSession,
   submitManualEntry,
 } from "@/lib/volunteer-actions";
+import MyShiftsList from "./MyShiftsList";
+import ShiftSignupBrowser from "./ShiftSignupBrowser";
 
 interface VolunteerInfo {
   name: string;
@@ -46,6 +48,8 @@ export default function VolunteerTimeClock({
   const [manualStartTime, setManualStartTime] = useState("");
   const [manualEndTime, setManualEndTime] = useState("");
   const [expireEndTimes, setExpireEndTimes] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState<"clock" | "shifts" | "browse">("clock");
+  const [shiftsRefreshKey, setShiftsRefreshKey] = useState(0);
 
   async function handleLookup(e: React.FormEvent) {
     e.preventDefault();
@@ -317,6 +321,54 @@ export default function VolunteerTimeClock({
             </div>
           </div>
 
+          {/* Tab Navigation */}
+          <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+            {(
+              [
+                { key: "clock", label: "Time Clock" },
+                { key: "shifts", label: "My Shifts" },
+                { key: "browse", label: "Browse Shifts" },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === tab.key
+                    ? "bg-white text-gray-900 shadow-sm"
+                    : "text-gray-600 hover:text-gray-800"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* My Shifts Tab */}
+          {activeTab === "shifts" && (
+            <MyShiftsList
+              key={shiftsRefreshKey}
+              orgId={orgId}
+              volunteerEmail={volunteer.email}
+              onRefreshNeeded={() => setShiftsRefreshKey((k) => k + 1)}
+            />
+          )}
+
+          {/* Browse Shifts Tab */}
+          {activeTab === "browse" && (
+            <ShiftSignupBrowser
+              key={shiftsRefreshKey}
+              orgId={orgId}
+              volunteerEmail={volunteer.email}
+              volunteerName={volunteer.name}
+              familyMembers={volunteer.familyMembers}
+              onRefreshNeeded={() => setShiftsRefreshKey((k) => k + 1)}
+            />
+          )}
+
+          {/* Time Clock Tab */}
+          {activeTab === "clock" && <>
+
           {/* Messages */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
@@ -519,6 +571,8 @@ export default function VolunteerTimeClock({
               </div>
             )}
           </div>
+
+          </>}
         </>
       )}
     </div>
