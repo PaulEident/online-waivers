@@ -49,6 +49,119 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   });
 }
 
+interface VolunteerHoursEntry {
+  volunteerName: string;
+  familyMemberName: string | null;
+  clockIn: Date;
+  clockOut: Date;
+  totalMinutes: number;
+}
+
+export async function sendVolunteerHoursEmail(
+  email: string,
+  orgName: string,
+  entries: VolunteerHoursEntry[]
+) {
+  if (entries.length === 0) return;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
+  const primaryName = entries[0].volunteerName;
+
+  const entryRows = entries.map((entry) => {
+    const hours = Math.floor(entry.totalMinutes / 60);
+    const mins = entry.totalMinutes % 60;
+    const duration = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+    const who = entry.familyMemberName || entry.volunteerName;
+    const dateStr = entry.clockIn.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const timeIn = entry.clockIn.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    const timeOut = entry.clockOut.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+    return `
+      <tr>
+        <td style="padding: 8px 12px; border-bottom: 1px solid #E5E7EB; color: #111827; font-size: 14px;">${who}</td>
+        <td style="padding: 8px 12px; border-bottom: 1px solid #E5E7EB; color: #6B7280; font-size: 14px;">${dateStr}</td>
+        <td style="padding: 8px 12px; border-bottom: 1px solid #E5E7EB; color: #6B7280; font-size: 14px;">${timeIn} — ${timeOut}</td>
+        <td style="padding: 8px 12px; border-bottom: 1px solid #E5E7EB; color: #111827; font-weight: 600; font-size: 14px;">${duration}</td>
+      </tr>`;
+  }).join("");
+
+  await resend.emails.send({
+    from: `Volntir <${fromEmail}>`,
+    to: email,
+    subject: `Volunteer hours logged — ${orgName}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 520px; margin: 0 auto; padding: 40px 20px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">Volunteer Hours Logged</h1>
+        </div>
+        <p style="color: #4B5563; font-size: 15px; line-height: 1.6;">
+          Hi ${primaryName}, volunteer hours have been logged at <strong>${orgName}</strong>.
+        </p>
+        <table style="width: 100%; border-collapse: collapse; margin: 24px 0; background: #F9FAFB; border-radius: 8px; overflow: hidden;">
+          <thead>
+            <tr style="background: #F3F4F6;">
+              <th style="padding: 8px 12px; text-align: left; color: #6B7280; font-size: 12px; font-weight: 600;">Who</th>
+              <th style="padding: 8px 12px; text-align: left; color: #6B7280; font-size: 12px; font-weight: 600;">Date</th>
+              <th style="padding: 8px 12px; text-align: left; color: #6B7280; font-size: 12px; font-weight: 600;">Time</th>
+              <th style="padding: 8px 12px; text-align: left; color: #6B7280; font-size: 12px; font-weight: 600;">Total</th>
+            </tr>
+          </thead>
+          <tbody>${entryRows}</tbody>
+        </table>
+        <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5;">
+          These hours are pending approval by the organization admin.
+        </p>
+      </div>
+    `,
+  });
+}
+
+export async function sendAdminVolunteerNotificationEmail(
+  adminEmails: string[],
+  orgName: string,
+  orgId: string,
+  entries: VolunteerHoursEntry[]
+) {
+  if (entries.length === 0 || adminEmails.length === 0) return;
+  const baseUrl = getBaseUrl();
+  const reviewUrl = `${baseUrl}/admin/org/${orgId}/volunteer-hours?status=PENDING`;
+  const fromEmail = process.env.RESEND_FROM_EMAIL || "noreply@volntir.com";
+
+  const totalMins = entries.reduce((sum, e) => sum + e.totalMinutes, 0);
+  const hours = Math.floor(totalMins / 60);
+  const mins = totalMins % 60;
+  const totalDuration = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  const names = [...new Set(entries.map((e) => e.familyMemberName || e.volunteerName))].join(", ");
+  const dateStr = entries[0].clockIn.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+
+  await resend.emails.send({
+    from: `Volntir <${fromEmail}>`,
+    to: adminEmails,
+    subject: `Volunteer hours to review — ${orgName}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 20px;">
+        <div style="text-align: center; margin-bottom: 32px;">
+          <h1 style="font-size: 24px; font-weight: bold; color: #111827; margin: 0;">Volunteer Hours to Review</h1>
+        </div>
+        <p style="color: #4B5563; font-size: 15px; line-height: 1.6;">
+          <strong>${names}</strong> logged <strong>${totalDuration}</strong> on ${dateStr} for <strong>${orgName}</strong>.
+        </p>
+        <div style="text-align: center; margin: 32px 0;">
+          <a href="${reviewUrl}" style="display: inline-block; background-color: #ea580c; color: white; font-weight: 600; font-size: 15px; padding: 12px 32px; border-radius: 8px; text-decoration: none;">
+            Review Hours
+          </a>
+        </div>
+        <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5;">
+          You're receiving this because you're an admin of ${orgName} on Volntir.
+        </p>
+        <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 32px 0;" />
+        <p style="color: #9CA3AF; font-size: 12px;">
+          If the button doesn't work, copy and paste this URL into your browser:<br />
+          <a href="${reviewUrl}" style="color: #ea580c; word-break: break-all;">${reviewUrl}</a>
+        </p>
+      </div>
+    `,
+  });
+}
+
 export async function sendWaiverConfirmationEmail(
   email: string,
   firstName: string,

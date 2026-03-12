@@ -1,4 +1,5 @@
 import { requireAuth, getUserWaivers, getUserOrgs } from "@/lib/actions";
+import { getVolunteerDashboard } from "@/lib/volunteer-actions";
 import Link from "next/link";
 
 export const dynamic = "force-dynamic";
@@ -7,6 +8,8 @@ export default async function DashboardPage() {
   const user = await requireAuth();
   const waivers = await getUserWaivers();
   const orgs = await getUserOrgs();
+  const volunteerData = await getVolunteerDashboard();
+  const openSessions = volunteerData.logs.filter((l) => !l.clockOut && l.status === "PENDING");
   const totalVolunteerHours = waivers
     .filter((w) => w.isVolunteer)
     .reduce((sum, w) => sum + (w.verifiedHours ? Number(w.verifiedHours) : w.volunteerHours ? Number(w.volunteerHours) : 0), 0);
@@ -73,18 +76,118 @@ export default async function DashboardPage() {
         </div>
 
         {/* Volunteer Hours Summary */}
-        {waivers.some((w) => w.isVolunteer) && (
+        {(waivers.some((w) => w.isVolunteer) || volunteerData.logs.length > 0) && (
           <div className="bg-white rounded-xl border border-gray-200/80 shadow-sm p-5 border-l-4 border-l-teal-500">
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-3">
               <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <h2 className="text-base font-bold text-gray-900">Volunteer Hours</h2>
             </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-3xl font-bold text-teal-700">{totalVolunteerHours}</span>
-              <span className="text-sm text-gray-500">total hours across {waivers.filter((w) => w.isVolunteer).length} event{waivers.filter((w) => w.isVolunteer).length !== 1 ? "s" : ""}</span>
-            </div>
+
+            {/* Org totals from time tracking */}
+            {volunteerData.orgTotals.length > 0 && (
+              <div className="space-y-2 mb-4">
+                {volunteerData.orgTotals.map((org) => (
+                  <div key={org.orgSlug} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{org.orgName}</p>
+                      <p className="text-xs text-gray-500">
+                        {Math.floor(org.approvedMinutes / 60)}h approved · {Math.floor(org.totalMinutes / 60)}h total
+                      </p>
+                    </div>
+                    <Link
+                      href={`/volunteer/${org.orgSlug}`}
+                      className="text-xs text-brand hover:text-brand-hover font-medium"
+                    >
+                      Log hours
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Open sessions */}
+            {openSessions.length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-amber-700 mb-2">Currently Clocked In</p>
+                {openSessions.map((session) => (
+                  <div key={session.id} className="flex items-center justify-between p-2 bg-amber-50 rounded-lg mb-1">
+                    <span className="text-sm text-gray-700">
+                      {session.familyMemberName || session.volunteerName} — {session.organization.name}
+                    </span>
+                    <Link
+                      href={`/volunteer/${session.organization.slug}`}
+                      className="text-xs text-amber-700 hover:text-amber-800 font-medium"
+                    >
+                      Clock out
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Time log entries */}
+            {volunteerData.logs.filter((l) => l.clockOut).length > 0 && (
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-gray-500 mb-2">Recent Time Logs</p>
+                <div className="space-y-1">
+                  {volunteerData.logs
+                    .filter((l) => l.clockOut)
+                    .map((log) => {
+                      const mins = log.totalMinutes || 0;
+                      const h = Math.floor(mins / 60);
+                      const m = mins % 60;
+                      const duration = h > 0 ? `${h}h ${m}m` : `${m}m`;
+                      const statusStyles: Record<string, string> = {
+                        PENDING: "bg-amber-100 text-amber-800",
+                        APPROVED: "bg-green-100 text-green-800",
+                        DISPUTED: "bg-red-100 text-red-800",
+                        EXPIRED: "bg-gray-100 text-gray-600",
+                      };
+                      return (
+                        <div key={log.id} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <p className="text-sm text-gray-900">
+                                {log.familyMemberName || log.volunteerName}
+                                <span className="text-gray-400 mx-1">·</span>
+                                <span className="text-gray-500">{log.organization.name}</span>
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {new Date(log.clockIn).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                {" · "}
+                                {new Date(log.clockIn).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                                {" — "}
+                                {new Date(log.clockOut!).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-end gap-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-gray-900">{duration}</span>
+                              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium ${statusStyles[log.status] || ""}`}>
+                                {log.status}
+                              </span>
+                            </div>
+                            {log.status === "DISPUTED" && log.adminNote && (
+                              <p className="text-[11px] text-red-600 max-w-[200px] text-right">{log.adminNote}</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
+            {/* Legacy waiver-based hours */}
+            {waivers.some((w) => w.isVolunteer) && (
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-bold text-teal-700">{totalVolunteerHours}</span>
+                <span className="text-sm text-gray-500">hours from event waivers</span>
+              </div>
+            )}
           </div>
         )}
 

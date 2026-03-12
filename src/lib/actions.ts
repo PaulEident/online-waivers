@@ -502,7 +502,7 @@ export async function submitWaiver(data: WaiverInput) {
 
   const isGuest = !userId;
 
-  await prisma.waiver.create({
+  const createdWaiver = await prisma.waiver.create({
     data: {
       userId,
       eventId: data.eventId,
@@ -521,6 +521,33 @@ export async function submitWaiver(data: WaiverInput) {
       familyMembers: data.familyMembers.length > 0 ? data.familyMembers : undefined,
     },
   });
+
+  // Create VolunteerTimeLog if volunteer with hours (Flow 4)
+  if (data.isVolunteer && data.volunteerHours && data.volunteerHours > 0) {
+    const clockIn = event.date || new Date();
+    const totalMinutes = Math.round(data.volunteerHours * 60);
+    const clockOut = new Date(clockIn.getTime() + totalMinutes * 60000);
+
+    try {
+      await prisma.volunteerTimeLog.create({
+        data: {
+          organizationId: event.orgId,
+          eventId: data.eventId,
+          waiverId: createdWaiver.id,
+          userId,
+          volunteerEmail: data.email.toLowerCase(),
+          volunteerName: `${data.firstName} ${data.lastName}`,
+          clockIn,
+          clockOut,
+          totalMinutes,
+          isManualEntry: true,
+          status: "PENDING",
+        },
+      });
+    } catch (error) {
+      console.error("Failed to create volunteer time log from waiver:", error);
+    }
+  }
 
   // Send confirmation email (non-blocking, don't fail submission)
   try {

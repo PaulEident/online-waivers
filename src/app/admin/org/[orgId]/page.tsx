@@ -75,6 +75,12 @@ export default async function OrgDashboardPage({
             Settings
           </Link>
           <Link
+            href={`/admin/org/${orgId}/volunteer-hours`}
+            className="px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-lg shadow hover:bg-gray-50 transition-colors"
+          >
+            Volunteer Hours
+          </Link>
+          <Link
             href="/dashboard"
             className="px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-lg shadow hover:bg-gray-50 transition-colors"
           >

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { updateOrganization, getOrganization } from "@/lib/actions";
+import { getVolunteerTimeConfig, updateVolunteerTimeConfig } from "@/lib/volunteer-actions";
 import Link from "next/link";
 import WaiverEditor from "@/components/WaiverEditor";
 
@@ -13,6 +14,11 @@ export default function OrgSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [vtEnabled, setVtEnabled] = useState(true);
+  const [vtAutoExpireHours, setVtAutoExpireHours] = useState(12);
+  const [vtRequireApproval, setVtRequireApproval] = useState(true);
+  const [vtSaving, setVtSaving] = useState(false);
+  const [vtMessage, setVtMessage] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +30,31 @@ export default function OrgSettingsPage() {
       setLoading(false);
     });
   }, [orgId]);
+
+  useEffect(() => {
+    getVolunteerTimeConfig(orgId).then((config) => {
+      if (config) {
+        setVtEnabled(config.enabled);
+        setVtAutoExpireHours(config.autoExpireHours);
+        setVtRequireApproval(config.requireApproval);
+      }
+    });
+  }, [orgId]);
+
+  const handleVtSave = async () => {
+    setVtSaving(true);
+    setVtMessage("");
+    const result = await updateVolunteerTimeConfig(orgId, {
+      enabled: vtEnabled,
+      autoExpireHours: vtAutoExpireHours,
+      requireApproval: vtRequireApproval,
+    });
+    if (result.success) {
+      setVtMessage("Volunteer tracking settings saved!");
+      setTimeout(() => setVtMessage(""), 3000);
+    }
+    setVtSaving(false);
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +121,55 @@ export default function OrgSettingsPage() {
               content={waiverTemplate}
               onChange={setWaiverTemplate}
             />
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">Volunteer Time Tracking</h2>
+            {vtMessage && (
+              <div className="bg-green-50 border border-green-200 rounded-md p-3 text-sm text-green-700 mb-4">
+                {vtMessage}
+              </div>
+            )}
+            <div className="space-y-4">
+              <label className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={vtEnabled}
+                  onChange={(e) => setVtEnabled(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
+                />
+                <span className="text-sm font-medium text-gray-700">Enable volunteer time tracking</span>
+              </label>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Auto-expire open sessions after (hours)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={vtAutoExpireHours}
+                  onChange={(e) => setVtAutoExpireHours(parseInt(e.target.value) || 12)}
+                  className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand focus:border-brand"
+                />
+              </div>
+              <label className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={vtRequireApproval}
+                  onChange={(e) => setVtRequireApproval(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-brand focus:ring-brand"
+                />
+                <span className="text-sm font-medium text-gray-700">Require admin approval for volunteer hours</span>
+              </label>
+              <button
+                type="button"
+                onClick={handleVtSave}
+                disabled={vtSaving}
+                className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-lg hover:bg-brand-hover disabled:opacity-50 transition-colors"
+              >
+                {vtSaving ? "Saving..." : "Save Tracking Settings"}
+              </button>
+            </div>
           </div>
 
           <div className="flex gap-3">

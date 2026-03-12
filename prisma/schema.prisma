@@ -32,6 +32,13 @@ enum SubmissionStatus {
   RESOLVED
 }
 
+enum TimeLogStatus {
+  PENDING
+  APPROVED
+  DISPUTED
+  EXPIRED
+}
+
 // ──────────────────────────────────────────
 // Auth (NextAuth.js v5)
 // ──────────────────────────────────────────
@@ -53,6 +60,8 @@ model User {
   waivers        Waiver[]
   checkIns       CheckIn[]
   checkedInBy    CheckIn[]      @relation("CheckedInBy")
+  volunteerTimeLogs  VolunteerTimeLog[] @relation("VolunteerTimeLogs")
+  reviewedTimeLogs   VolunteerTimeLog[] @relation("ReviewedTimeLogs")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -107,6 +116,8 @@ model Organization {
 
   members OrgMember[]
   events  Event[]
+  volunteerTimeLogs   VolunteerTimeLog[]
+  volunteerTimeConfig VolunteerTimeConfig?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -142,6 +153,7 @@ model Event {
   waivers  Waiver[]
   checkIns CheckIn[]
   managers EventManager[]
+  volunteerTimeLogs VolunteerTimeLog[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -203,6 +215,7 @@ model Waiver {
 
   user  User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
   event Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  volunteerTimeLogs VolunteerTimeLog[]
 
   createdAt DateTime @default(now())
 
@@ -223,6 +236,51 @@ model CheckIn {
   checkedInAt DateTime @default(now())
 
   @@unique([userId, eventId])
+}
+
+// ──────────────────────────────────────────
+// Volunteer Time Tracking
+// ──────────────────────────────────────────
+
+model VolunteerTimeLog {
+  id               String        @id @default(cuid())
+  organizationId   String
+  eventId          String?
+  waiverId         String?
+  userId           String?
+  volunteerEmail   String
+  volunteerName    String
+  familyMemberName String?
+  clockIn          DateTime
+  clockOut         DateTime?
+  totalMinutes     Int?
+  isManualEntry    Boolean       @default(false)
+  status           TimeLogStatus @default(PENDING)
+  reviewedBy       String?
+  reviewedAt       DateTime?
+  adminNote        String?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  event        Event?       @relation(fields: [eventId], references: [id], onDelete: SetNull)
+  waiver       Waiver?      @relation(fields: [waiverId], references: [id], onDelete: SetNull)
+  user         User?        @relation("VolunteerTimeLogs", fields: [userId], references: [id], onDelete: SetNull)
+  reviewer     User?        @relation("ReviewedTimeLogs", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VolunteerTimeConfig {
+  id              String  @id @default(cuid())
+  organizationId  String  @unique
+  autoExpireHours Int     @default(12)
+  requireApproval Boolean @default(true)
+  enabled         Boolean @default(true)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // ──────────────────────────────────────────

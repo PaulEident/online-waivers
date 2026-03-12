@@ -57,6 +57,7 @@ export default function WaiverEditor({
   const [showVariables, setShowVariables] = useState(false);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [3, 4] },
