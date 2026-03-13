@@ -13,6 +13,7 @@ export default function OrgSettingsPage() {
   const [waiverTemplate, setWaiverTemplate] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showAttorneyBanner, setShowAttorneyBanner] = useState(false);
   const [message, setMessage] = useState("");
   const [vtEnabled, setVtEnabled] = useState(true);
   const [vtAutoExpireHours, setVtAutoExpireHours] = useState(12);
@@ -40,6 +41,11 @@ export default function OrgSettingsPage() {
       }
     });
   }, [orgId]);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem("attorney-recommendation-dismissed");
+    if (!dismissed) setShowAttorneyBanner(true);
+  }, []);
 
   const handleVtSave = async () => {
     setVtSaving(true);
@@ -117,6 +123,34 @@ export default function OrgSettingsPage() {
             <p className="text-sm text-gray-500 mb-3">
               This template is used as the starting point when creating new events. Each event gets its own copy that can be customized.
             </p>
+            {showAttorneyBanner && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-3 relative">
+                <button
+                  onClick={() => {
+                    localStorage.setItem("attorney-recommendation-dismissed", "true");
+                    setShowAttorneyBanner(false);
+                  }}
+                  className="absolute top-2 right-2 text-amber-400 hover:text-amber-600 transition-colors"
+                  aria-label="Dismiss"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <h4 className="text-sm font-bold text-amber-900 mb-1">A note on waiver language</h4>
+                <p className="text-sm text-amber-800 leading-relaxed">
+                  The effectiveness of a liability waiver depends entirely on how it&apos;s written — and what&apos;s enforceable varies by state, event type, and activity. Volntir gives you a flexible editor to build and collect waivers, but we&apos;re not able to guarantee that any particular waiver language will hold up in court.
+                </p>
+                <p className="text-sm text-amber-800 leading-relaxed mt-2">
+                  We strongly recommend consulting a licensed attorney to draft or review your waiver before using it for your events. An attorney familiar with your state and activity type can ensure your waiver covers the risks specific to your organization.
+                </p>
+              </div>
+            )}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+              <p className="text-sm text-blue-800 leading-relaxed">
+                Volntir provides the tools to collect waivers, but the language in your waiver determines your legal protection. We recommend working with an attorney familiar with your event type and jurisdiction to draft waiver language specific to your organization&apos;s needs.
+              </p>
+            </div>
             <WaiverEditor
               content={waiverTemplate}
               onChange={setWaiverTemplate}

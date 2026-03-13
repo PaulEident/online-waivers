@@ -158,6 +158,42 @@ function WaiversTab() {
           <TipBox>Whichever method you choose, keep it consistent across your event staff so everyone knows what to look for. A quick briefing before the event goes a long way.</TipBox>
         </div>
       </section>
+
+      {/* Attorney Recommendation */}
+      <section className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+        <div className="flex items-start gap-3 mb-3">
+          <svg className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h2 className="text-lg font-extrabold text-blue-900">Getting your waiver language right matters</h2>
+        </div>
+        <div className="space-y-3 text-[15px] text-blue-800 leading-relaxed">
+          <p>
+            Volntir makes it easy to collect signed waivers — but the legal strength of a waiver comes from what it says, not just the fact that someone signed it. Courts evaluate waiver language carefully, and waivers that are too vague, missing key disclosures, or not appropriate for your specific activity can be thrown out entirely.
+          </p>
+          <p>
+            Every organization is different. A youth soccer league, a food festival, and a 5K fundraiser each carry different risks — and effective waiver language reflects those differences.
+          </p>
+          <p className="font-semibold">We recommend working with a licensed attorney to:</p>
+          <ul className="space-y-2 ml-1">
+            <li className="flex items-start gap-2">
+              <svg className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              <span>Draft waiver language specific to your organization and the activities involved</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <svg className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              <span>Ensure your waiver is appropriate for your state&apos;s laws</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <svg className="w-4 h-4 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              <span>Review your waiver periodically as your events or activities change</span>
+            </li>
+          </ul>
+          <p className="text-blue-700">
+            Volntir handles the collection, signing, and recordkeeping. The right attorney can make sure the waiver itself gives you the protection you&apos;re looking for.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
