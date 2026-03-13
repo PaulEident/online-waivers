@@ -4,6 +4,7 @@ import { prisma } from "./prisma";
 import { auth } from "./auth";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import bcrypt from "bcryptjs";
 import { verifyTurnstile } from "./turnstile";
 import { sanitizeHtml } from "./sanitize";
@@ -110,23 +111,7 @@ export async function setMarketingOptIn(optIn: boolean) {
 // Organizations (Super Admin)
 // ──────────────────────────────────────────
 
-const DEFAULT_WAIVER_TEMPLATE = `<h3>RELEASE AND WAIVER OF LIABILITY, ASSUMPTION OF RISK, AND INDEMNITY AGREEMENT</h3>
-<p><strong>EVENT:</strong> {{EVENT_NAME}}, organized by {{ORG_NAME}}</p>
-<p>In consideration of being permitted to participate in {{EVENT_NAME}} and any related activities organized by {{ORG_NAME}}, I hereby freely and voluntarily execute this Release and Waiver of Liability.</p>
-<h4>1. ASSUMPTION OF RISK</h4>
-<p>I acknowledge that participation involves inherent risks, dangers, and hazards. I understand that these risks may result in personal injury, illness, death, or property damage, and I voluntarily assume all such risks.</p>
-<h4>2. RELEASE OF LIABILITY</h4>
-<p>I, on behalf of myself, my heirs, personal representatives, and assigns, hereby release, discharge, and hold harmless {{ORG_NAME}}, its members, officers, directors, volunteers, agents, sponsors, and any landowners from any and all claims arising out of my participation.</p>
-<h4>3. INDEMNIFICATION</h4>
-<p>I agree to indemnify, defend, and hold harmless {{ORG_NAME}} from and against any and all claims, damages, losses, and expenses arising out of my participation.</p>
-<h4>4. MEDICAL ACKNOWLEDGMENT</h4>
-<p>I certify that I am physically fit and have not been advised against participation by a medical professional. I consent to receive medical treatment in the event of injury.</p>
-<h4>5. PARENT/GUARDIAN CONSENT FOR MINORS</h4>
-<p>If I am registering minor children (under 18 years of age) as family members on this waiver, I certify that I am the parent or legal guardian of each listed minor. I agree to assume all risks on their behalf and accept full responsibility for their participation. I further agree that this Release and Waiver of Liability, Assumption of Risk, and Indemnity Agreement applies to each minor listed, with the same force and effect as if each minor had signed individually.</p>
-<h4>6. PHOTO AND MEDIA RELEASE</h4>
-<p>I grant {{ORG_NAME}} permission to use photographs and media taken during the event for promotional purposes.</p>
-<h4>7. ACKNOWLEDGMENT</h4>
-<p>I have read this Agreement, fully understand its terms, and agree to be bound by them. I understand that I am giving up substantial rights, including my right to sue.</p>`;
+const DEFAULT_WAIVER_TEMPLATE = ``;
 
 export async function createOrganization(data: { name: string; slug: string; ownerId?: string }) {
   await requireRole(["SUPER_ADMIN"]);
@@ -315,7 +300,7 @@ export async function createEvent(orgId: string, data: {
       endDate: data.endDate ? new Date(data.endDate) : null,
       location: data.location || null,
       description: data.description || null,
-      waiverTemplate: org?.waiverTemplate || DEFAULT_WAIVER_TEMPLATE,
+      waiverTemplate: org?.waiverTemplate || "",
     },
   });
 
@@ -481,10 +466,12 @@ interface WaiverInput {
   emergencyContactPhone: string;
   signatureType: "draw" | "type";
   signatureData: string;
+  electronicConsent: boolean;
+  waiverContentSnapshot?: string;
   mailchimpOptIn: boolean;
   isVolunteer: boolean;
   volunteerHours?: number;
-  familyMembers: { firstName: string; lastName: string; age: number }[];
+  familyMembers: { firstName: string; lastName: string; age: number; relationship: string; relationshipOther?: string }[];
   volntirMarketingOptIn?: boolean;
 }
 
@@ -512,6 +499,13 @@ export async function submitWaiver(data: WaiverInput) {
   });
   if (!event) return { error: "Event not found" };
 
+  // Capture IP address and user agent for audit trail
+  const headersList = await headers();
+  const ipAddress = headersList.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || headersList.get("x-real-ip")
+    || "unknown";
+  const userAgent = headersList.get("user-agent") || "unknown";
+
   const isGuest = !userId;
 
   const createdWaiver = await prisma.waiver.create({
@@ -527,6 +521,10 @@ export async function submitWaiver(data: WaiverInput) {
       emergencyContactPhone: data.emergencyContactPhone,
       signatureType: data.signatureType,
       signatureData: data.signatureData,
+      ipAddress,
+      userAgent,
+      electronicConsent: data.electronicConsent,
+      waiverContentSnapshot: data.waiverContentSnapshot ? sanitizeHtml(data.waiverContentSnapshot) : null,
       mailchimpOptIn: data.mailchimpOptIn,
       isVolunteer: data.isVolunteer,
       volunteerHours: data.isVolunteer && data.volunteerHours ? data.volunteerHours : null,
@@ -570,7 +568,13 @@ export async function submitWaiver(data: WaiverInput) {
       event.org.name,
       new Date(),
       data.familyMembers.length,
-      isGuest
+      isGuest,
+      data.waiverContentSnapshot || undefined,
+      data.familyMembers.length > 0 ? data.familyMembers.map((fm) => ({
+        firstName: fm.firstName,
+        lastName: fm.lastName,
+        relationship: fm.relationship,
+      })) : undefined
     );
   } catch (error) {
     console.error("Waiver confirmation email error:", error);
@@ -734,6 +738,46 @@ export async function getUserWaiver(id: string) {
       event: { include: { org: true } },
     },
   });
+}
+
+// ──────────────────────────────────────────
+// Waiver Deletion (Organizer Data Management)
+// ──────────────────────────────────────────
+
+export async function deleteWaiver(waiverId: string) {
+  const waiver = await prisma.waiver.findUnique({
+    where: { id: waiverId },
+    select: { eventId: true, event: { select: { orgId: true } } },
+  });
+  if (!waiver) return { error: "Waiver not found" };
+
+  await requireEventAccess(waiver.eventId);
+
+  await prisma.$transaction([
+    prisma.volunteerTimeLog.deleteMany({ where: { waiverId } }),
+    prisma.waiver.delete({ where: { id: waiverId } }),
+  ]);
+
+  revalidatePath(`/admin/event/${waiver.eventId}/waivers`);
+  return { success: true };
+}
+
+export async function deleteEventWaivers(eventId: string) {
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    select: { orgId: true },
+  });
+  if (!event) return { error: "Event not found" };
+
+  await requireOrgAccess(event.orgId);
+
+  await prisma.$transaction([
+    prisma.volunteerTimeLog.deleteMany({ where: { eventId } }),
+    prisma.waiver.deleteMany({ where: { eventId } }),
+  ]);
+
+  revalidatePath(`/admin/event/${eventId}/waivers`);
+  return { success: true };
 }
 
 // ──────────────────────────────────────────

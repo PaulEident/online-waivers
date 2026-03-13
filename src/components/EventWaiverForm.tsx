@@ -19,6 +19,7 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
   const [signatureType, setSignatureType] = useState<"draw" | "type">("draw");
   const [signatureData, setSignatureData] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const [electronicConsent, setElectronicConsent] = useState(false);
   const [mailchimpOptIn, setMailchimpOptIn] = useState(false);
   const [volntirMarketingOptIn, setVolntirMarketingOptIn] = useState(true);
   const [isVolunteer, setIsVolunteer] = useState(false);
@@ -76,10 +77,15 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
       if (!fm.age || isNaN(age) || age < 0 || age >= 18) {
         validationErrors.push(`Child #${i + 1}: Age must be between 0 and 17`);
       }
+      if (!fm.relationship) validationErrors.push(`Child #${i + 1}: Relationship is required`);
+      if (fm.relationship === "Other" && !fm.relationshipOther?.trim()) {
+        validationErrors.push(`Child #${i + 1}: Please specify your relationship`);
+      }
     }
 
     if (!signatureData) validationErrors.push("Signature is required");
     if (!agreed) validationErrors.push("You must agree to the waiver terms");
+    if (!electronicConsent) validationErrors.push("You must consent to sign electronically");
 
     if (validationErrors.length > 0) {
       setErrors(validationErrors);
@@ -100,6 +106,8 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
         emergencyContactPhone: emergencyContactPhone.trim(),
         signatureType,
         signatureData,
+        electronicConsent,
+        waiverContentSnapshot: renderedTemplate,
         mailchimpOptIn,
         isVolunteer,
         volunteerHours: isVolunteer && volunteerHours ? parseFloat(volunteerHours) : undefined,
@@ -108,6 +116,8 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
           firstName: fm.firstName.trim(),
           lastName: fm.lastName.trim(),
           age: parseInt(fm.age),
+          relationship: fm.relationship,
+          relationshipOther: fm.relationship === "Other" ? fm.relationshipOther?.trim() : undefined,
         })),
       });
       if (result && "error" in result) {
@@ -250,6 +260,22 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
             <span className="text-red-500"> *</span>
           </label>
         </div>
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            id="electronicConsent"
+            checked={electronicConsent}
+            onChange={(e) => setElectronicConsent(e.target.checked)}
+            className="mt-1 h-5 w-5 text-brand border-gray-300 rounded focus:ring-brand"
+          />
+          <label htmlFor="electronicConsent" className="text-sm text-gray-700">
+            <span className="font-semibold">
+              I consent to sign this waiver electronically.
+            </span>{" "}
+            I understand that my electronic signature has the same legal effect as a handwritten signature.
+            <span className="text-red-500"> *</span>
+          </label>
+        </div>
       </section>
 
       {/* Signature */}
@@ -294,6 +320,9 @@ export default function EventWaiverForm({ eventId, renderedTemplate, orgName, sh
               <span className="text-sm text-gray-500">hours</span>
             </div>
             <p className="text-xs text-gray-500 mt-1">Your hours will be verified by the event organizer.</p>
+            <p className="text-xs text-gray-400 mt-1">
+              Volntir records are for organizational tracking only. Courts and supervising agencies determine what constitutes valid documentation for compliance purposes.
+            </p>
           </div>
         )}
       </section>

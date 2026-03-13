@@ -235,7 +235,7 @@ export default function Home() {
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Volunteer Hours Tracking</h3>
             <p className="text-sm text-gray-600 leading-relaxed">
-              Volunteers clock in and out or log past hours. Admins review and approve — perfect for tracking community service and court-ordered hours.
+              Volunteers clock in and out or log past hours. Admins review and approve — great for tracking community service hours.
             </p>
           </div>
         </div>

@@ -211,6 +211,10 @@ model Waiver {
   ipAddress     String?
   userAgent     String?
 
+  // Legal compliance
+  electronicConsent     Boolean  @default(false)
+  waiverContentSnapshot String?  @db.Text
+
   // Marketing opt-in
   mailchimpOptIn Boolean @default(false)
 

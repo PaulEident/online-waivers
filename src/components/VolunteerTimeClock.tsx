@@ -369,6 +369,11 @@ export default function VolunteerTimeClock({
           {/* Time Clock Tab */}
           {activeTab === "clock" && <>
 
+          {/* Legal Disclaimer */}
+          <p className="text-xs text-gray-400 italic">
+            Volntir records are for organizational tracking only. Courts and supervising agencies determine what constitutes valid documentation for compliance purposes.
+          </p>
+
           {/* Messages */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">

@@ -351,7 +351,9 @@ export async function sendWaiverConfirmationEmail(
   orgName: string,
   signedAt: Date,
   familyMemberCount: number,
-  isGuest: boolean = false
+  isGuest: boolean = false,
+  waiverContentSnapshot?: string,
+  familyMembersDetail?: { firstName: string; lastName: string; relationship: string }[]
 ) {
   const baseUrl = getBaseUrl();
   const dashboardUrl = `${baseUrl}/dashboard`;
@@ -360,6 +362,23 @@ export async function sendWaiverConfirmationEmail(
 
   const familyLine = familyMemberCount > 0
     ? `<p style="color: #4B5563; font-size: 15px; line-height: 1.6;">You also registered <strong>${familyMemberCount} family member${familyMemberCount > 1 ? "s" : ""}</strong>.</p>`
+    : "";
+
+  const familyDetailSection = familyMembersDetail && familyMembersDetail.length > 0
+    ? `<div style="background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px; margin: 16px 0;">
+        <p style="color: #6B7280; font-size: 13px; margin: 0 0 8px 0; font-weight: 600;">Family Members Covered</p>
+        ${familyMembersDetail.map((fm) => `<p style="color: #111827; font-size: 14px; margin: 4px 0;">Signed as ${fm.relationship} of ${fm.firstName} ${fm.lastName}</p>`).join("")}
+      </div>`
+    : "";
+
+  const waiverCopySection = waiverContentSnapshot
+    ? `<div style="margin: 24px 0;">
+        <p style="color: #6B7280; font-size: 13px; font-weight: 600; margin: 0 0 8px 0;">Your Signed Waiver</p>
+        <div style="background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px; max-height: 400px; overflow: auto; font-size: 13px; color: #374151; line-height: 1.6;">
+          ${waiverContentSnapshot}
+        </div>
+        <p style="color: #9CA3AF; font-size: 12px; margin: 8px 0 0 0;">This is a copy of the waiver you signed. Keep this email for your records.</p>
+      </div>`
     : "";
 
   await resend.emails.send({
@@ -375,10 +394,12 @@ export async function sendWaiverConfirmationEmail(
           Hi ${firstName}, your waiver for <strong>${eventName}</strong> hosted by <strong>${orgName}</strong> has been signed successfully.
         </p>
         ${familyLine}
+        ${familyDetailSection}
         <div style="background-color: #F3F4F6; border-radius: 8px; padding: 16px; margin: 24px 0;">
           <p style="color: #6B7280; font-size: 13px; margin: 0 0 4px 0;">Signed on</p>
           <p style="color: #111827; font-size: 15px; font-weight: 600; margin: 0;">${signedAt.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
         </div>
+        ${waiverCopySection}
         ${isGuest ? `
         <div style="background-color: #FFF7ED; border: 1px solid #FFEDD5; border-radius: 8px; padding: 16px; margin: 24px 0; text-align: center;">
           <p style="color: #9A3412; font-size: 14px; font-weight: 600; margin: 0 0 8px 0;">Want to view your waiver anytime?</p>

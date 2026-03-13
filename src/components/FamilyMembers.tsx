@@ -6,6 +6,8 @@ export interface FamilyMember {
   firstName: string;
   lastName: string;
   age: string;
+  relationship: string;
+  relationshipOther: string;
 }
 
 interface FamilyMembersProps {
@@ -15,7 +17,7 @@ interface FamilyMembersProps {
 
 export default function FamilyMembers({ members, onChange }: FamilyMembersProps) {
   const addMember = () => {
-    onChange([...members, { firstName: "", lastName: "", age: "" }]);
+    onChange([...members, { firstName: "", lastName: "", age: "", relationship: "Parent", relationshipOther: "" }]);
   };
 
   const removeMember = (index: number) => {
@@ -112,6 +114,38 @@ export default function FamilyMembers({ members, onChange }: FamilyMembersProps)
                 placeholder="Age"
               />
             </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">
+                Your Relationship <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={member.relationship}
+                onChange={(e) => updateMember(index, "relationship", e.target.value)}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-brand focus:border-brand bg-white"
+              >
+                <option value="Parent">Parent</option>
+                <option value="Legal Guardian">Legal Guardian</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            {member.relationship === "Other" && (
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">
+                  Specify Relationship <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={member.relationshipOther}
+                  onChange={(e) => updateMember(index, "relationshipOther", e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-brand focus:border-brand"
+                  placeholder="e.g., Grandparent, Step-parent"
+                />
+              </div>
+            )}
           </div>
         </div>
       ))}

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { requireEventAccess, getWaiver } from "@/lib/actions";
 import Link from "next/link";
+import DeleteWaiverButton from "@/components/DeleteWaiverButton";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export default async function WaiverDetailPage({
   // Verify the user has access to this waiver's event/organization
   await requireEventAccess(waiver.eventId);
 
-  const familyMembers = waiver.familyMembers as Array<{ firstName: string; lastName: string; age: number }> | null;
+  const familyMembers = waiver.familyMembers as Array<{ firstName: string; lastName: string; age: number; relationship?: string; relationshipOther?: string }> | null;
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -119,15 +120,53 @@ export default async function WaiverDetailPage({
                   key={i}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                 >
-                  <span className="font-medium text-gray-900">
-                    {fm.firstName} {fm.lastName}
+                  <div>
+                    <span className="font-medium text-gray-900">
+                      {fm.firstName} {fm.lastName}
+                    </span>
+                    <span className="text-sm text-gray-500 ml-2">Age: {fm.age}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    Signed by {waiver.firstName} {waiver.lastName} as {fm.relationship === "Other" ? fm.relationshipOther : fm.relationship || "Parent/Guardian"}
                   </span>
-                  <span className="text-sm text-gray-500">Age: {fm.age}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
+
+        {/* Audit Trail */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+            Audit Trail
+          </h2>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <dt className="text-xs text-gray-500">IP Address</dt>
+              <dd className="text-sm font-medium text-gray-900">{waiver.ipAddress || "Not recorded"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-gray-500">User Agent</dt>
+              <dd className="text-sm font-medium text-gray-900 break-all text-xs">{waiver.userAgent || "Not recorded"}</dd>
+            </div>
+            <div>
+              <dt className="text-xs text-gray-500">Electronic Consent</dt>
+              <dd className="text-sm font-medium text-gray-900">
+                {(waiver as Record<string, unknown>).electronicConsent ? (
+                  <span className="text-teal-700">Yes</span>
+                ) : (
+                  <span className="text-gray-400">No</span>
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-gray-500">Signed At</dt>
+              <dd className="text-sm font-medium text-gray-900">
+                {new Date(waiver.signedAt).toLocaleString()}
+              </dd>
+            </div>
+          </dl>
+        </div>
 
         {/* Volunteer Information */}
         {waiver.isVolunteer && (
@@ -197,6 +236,17 @@ export default async function WaiverDetailPage({
           <p className="text-xs text-gray-400 mt-2">
             Signature type: {waiver.signatureType === "draw" ? "Hand-drawn" : "Typed"}
           </p>
+        </div>
+
+        {/* Data Management */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">
+            Data Management
+          </h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Permanently delete this waiver record and all associated volunteer time logs. This action cannot be undone.
+          </p>
+          <DeleteWaiverButton waiverId={waiver.id} eventId={waiver.eventId} />
         </div>
       </div>
     </main>

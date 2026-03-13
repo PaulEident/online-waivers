@@ -14,7 +14,7 @@ export default async function WaiverDetailPage({
   const waiver = await getUserWaiver(id);
   if (!waiver) notFound();
 
-  const familyMembers = waiver.familyMembers as Array<{ firstName: string; lastName: string; age: number }> | null;
+  const familyMembers = waiver.familyMembers as Array<{ firstName: string; lastName: string; age: number; relationship?: string; relationshipOther?: string }> | null;
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -105,10 +105,15 @@ export default async function WaiverDetailPage({
                   key={i}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
                 >
-                  <span className="font-medium text-gray-900">
-                    {fm.firstName} {fm.lastName}
+                  <div>
+                    <span className="font-medium text-gray-900">
+                      {fm.firstName} {fm.lastName}
+                    </span>
+                    <span className="text-sm text-gray-500 ml-2">Age: {fm.age}</span>
+                  </div>
+                  <span className="text-xs text-gray-500">
+                    {fm.relationship === "Other" ? fm.relationshipOther : fm.relationship || "Parent/Guardian"}
                   </span>
-                  <span className="text-sm text-gray-500">Age: {fm.age}</span>
                 </div>
               ))}
             </div>
