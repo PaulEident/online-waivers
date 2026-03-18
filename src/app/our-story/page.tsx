@@ -93,9 +93,10 @@ export default function OurStoryPage() {
               <h2 className="text-xl font-bold text-gray-900">Our Mission</h2>
             </div>
             <p>
-              Volntir exists for one reason: to help organizations protect themselves with proper waivers while staying
-              organized with attendance — without the headache. We believe every group, club, and nonprofit should have
-              access to tools that make running events easier, regardless of their budget.
+              Volntir exists to help organizations protect themselves with proper waivers, stay organized with attendance,
+              coordinate volunteers through shift signups, and track volunteer hours — all without the headache. We believe
+              every group, club, and nonprofit should have access to tools that make running events easier, regardless of
+              their budget.
             </p>
           </section>
 
@@ -111,8 +112,9 @@ export default function OurStoryPage() {
             </div>
             <p>
               Volntir is currently in beta, and we&apos;re actively building based on feedback from real organizers like you.
-              The core features — creating events, collecting signed waivers, and managing attendees — will always be free.
-              We really hope this application helps your organization, and we&apos;d love to hear from you.
+              The core features — creating events, collecting signed waivers, managing attendees, volunteer shift signups,
+              and volunteer hours tracking — will always be free. We&apos;re continuing to add tools that make organizing
+              easier, and we&apos;d love to hear what would help your organization most.
             </p>
           </section>
         </div>

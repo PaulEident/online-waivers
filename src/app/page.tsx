@@ -256,8 +256,8 @@ export default function Home() {
               Why Is Volntir Free?
             </h2>
             <p className="text-gray-400 max-w-xl mx-auto leading-relaxed">
-              Our mission is simple: make it easy for organizations and attendees to manage waivers for events —
-              without the hassle of paper forms or expensive software.
+              Our mission is simple: make it easy for organizations and attendees to manage events —
+              from waivers and check-ins to volunteer shift signups and hours tracking — without the hassle of paper forms or expensive software.
             </p>
           </div>
 
@@ -290,13 +290,31 @@ export default function Home() {
               <h3 className="font-bold text-white text-sm mb-1">Manage Attendees</h3>
               <p className="text-xs text-gray-500">Check-in &amp; search, always free</p>
             </div>
+            <div className="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+              <div className="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-white text-sm mb-1">Volunteer Shift Signups</h3>
+              <p className="text-xs text-gray-500">Create shifts, manage slots &amp; waitlists, always free</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+              <div className="w-10 h-10 bg-green-500/15 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="font-bold text-white text-sm mb-1">Volunteer Hours Tracking</h3>
+              <p className="text-xs text-gray-500">Clock in/out, review &amp; approve hours, always free</p>
+            </div>
           </div>
 
           {/* Explanation */}
           <div className="bg-white/5 rounded-xl p-6 md:p-8 border border-white/10 mb-10">
             <p className="text-gray-300 leading-relaxed text-sm md:text-base mb-4">
               Volntir is currently in beta, and <strong className="text-white">the core features will always be free</strong> —
-              creating events, collecting signed waivers, and managing attendees. No credit card, no trial
+              creating events, collecting signed waivers, managing attendees, volunteer shift signups, and volunteer hours tracking. No credit card, no trial
               period, no strings attached.
             </p>
             <p className="text-gray-400 leading-relaxed text-sm md:text-base">
