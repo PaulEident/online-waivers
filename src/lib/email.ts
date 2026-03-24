@@ -2,6 +2,36 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
 
+/**
+ * Add a contact to the Resend Audience when a user opts into Volntir marketing emails.
+ * Gracefully no-ops if RESEND_AUDIENCE_ID is not set.
+ * Failures are logged but never thrown.
+ */
+export async function subscribeToResendAudience(
+  email: string,
+  firstName: string,
+  lastName: string
+): Promise<void> {
+  const audienceId = process.env.RESEND_AUDIENCE_ID;
+  if (!audienceId) {
+    console.log("[Resend Audience] Skipped (no RESEND_AUDIENCE_ID):", email);
+    return;
+  }
+  try {
+    await resend.contacts.create({
+      audienceId,
+      email,
+      firstName,
+      lastName,
+      unsubscribed: false,
+    });
+    console.log("[Resend Audience] Subscribed:", email);
+  } catch (err: any) {
+    // Resend returns a 409-equivalent if contact already exists — not an error worth surfacing
+    console.error("[Resend Audience] Failed to subscribe:", email, err?.message ?? err);
+  }
+}
+
 function getBaseUrl(): string {
   // Explicit override (set in Vercel env vars or .env)
   if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL;

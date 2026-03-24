@@ -9,7 +9,7 @@ import bcrypt from "bcryptjs";
 import { verifyTurnstile } from "./turnstile";
 import { sanitizeHtml } from "./sanitize";
 import crypto from "crypto";
-import { sendPasswordResetEmail, sendWaiverConfirmationEmail } from "./email";
+import { sendPasswordResetEmail, sendWaiverConfirmationEmail, subscribeToResendAudience } from "./email";
 
 // ──────────────────────────────────────────
 // Auth helpers
@@ -95,6 +95,17 @@ export async function signUp(data: {
       marketingOptIn: data.marketingOptIn ?? false,
     },
   });
+
+  // Subscribe to Resend Audience if opted in
+  if (data.marketingOptIn) {
+    const nameParts = data.name.trim().split(/\s+/);
+    const firstName = nameParts[0] ?? "";
+    const lastName = nameParts.slice(1).join(" ") ?? "";
+    subscribeToResendAudience(data.email, firstName, lastName).catch((err) =>
+      console.error("[signUp] Resend audience subscribe failed:", err)
+    );
+  }
+
   return { success: true };
 }
 
@@ -580,7 +591,7 @@ export async function submitWaiver(data: WaiverInput) {
     console.error("Waiver confirmation email error:", error);
   }
 
-  // Subscribe to Mailchimp if opted in
+  // Subscribe to Mailchimp if opted in (org-level audience — kept as-is)
   if (data.mailchimpOptIn) {
     try {
       await subscribeToMailchimp(data.email, data.firstName, data.lastName);
@@ -589,15 +600,21 @@ export async function submitWaiver(data: WaiverInput) {
     }
   }
 
-  // Update Volntir marketing opt-in for authenticated users
-  if (data.volntirMarketingOptIn && userId) {
-    try {
-      await prisma.user.update({
-        where: { id: userId },
-        data: { marketingOptIn: true },
-      });
-    } catch (error) {
-      console.error("Marketing opt-in update error:", error);
+  // Subscribe to Resend Audience + update DB if user opted into Volntir marketing
+  if (data.volntirMarketingOptIn) {
+    subscribeToResendAudience(data.email, data.firstName, data.lastName).catch((err) =>
+      console.error("[waiver] Resend audience subscribe failed:", err)
+    );
+
+    if (userId) {
+      try {
+        await prisma.user.update({
+          where: { id: userId },
+          data: { marketingOptIn: true },
+        });
+      } catch (error) {
+        console.error("Marketing opt-in update error:", error);
+      }
     }
   }
 
