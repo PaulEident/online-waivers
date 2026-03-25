@@ -8,9 +8,10 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: "Volntir",
-  applicationCategory: "BusinessApplication",
+  applicationCategory: "UtilitiesApplication",
   operatingSystem: "Web",
-  description: "Free digital waiver management platform for events and organizations. Collect electronic signatures, manage check-ins, and organize unlimited events.",
+  description: "Free volunteer management software for nonprofits and events. Collect digital waivers, manage volunteer shift signups, track hours, and check in attendees — all free.",
+  keywords: ["volunteer management software", "nonprofit volunteer management", "free volunteer software", "digital waiver", "volunteer hour tracking", "volunteer shift signup"],
   offers: {
     "@type": "Offer",
     price: "0",
@@ -63,15 +64,14 @@ export default function Home() {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-            Event Management,<br />
+            Free Volunteer Management<br />
             <span className="bg-gradient-to-r from-brand-500 via-orange-400 to-amber-400 bg-clip-text text-transparent">
-              Simplified
+              for Nonprofits &amp; Events
             </span>
           </h1>
 
           <p className="text-gray-400 text-lg md:text-xl max-w-xl mx-auto mb-8 leading-relaxed">
-            Collect digital waivers, manage volunteer shift signups, and track hours
-            — all in one free platform for events and organizations.
+            Free volunteer management software for nonprofits — shift signups, digital waivers, attendee check-ins, and hour tracking. No credit card. No trial period.
           </p>
 
           {/* FREE callout */}

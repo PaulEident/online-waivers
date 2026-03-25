@@ -30,7 +30,12 @@ export default function Turnstile({
 
   useEffect(() => {
     const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-    if (!siteKey || !containerRef.current) return;
+    // Dev bypass: if no site key configured, auto-verify
+    if (!siteKey) {
+      onVerify("dev-bypass-token");
+      return;
+    }
+    if (!containerRef.current) return;
 
     function renderWidget() {
       if (!window.turnstile || !containerRef.current) return;

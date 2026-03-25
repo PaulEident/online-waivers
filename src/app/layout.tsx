@@ -19,11 +19,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Volntir - Free Digital Waiver Management for Events",
+    default: "Free Volunteer Management Software for Nonprofits & Events | Volntir",
     template: "%s | Volntir",
   },
-  description: "Free digital waiver platform for events and organizations. Collect electronic signatures, manage check-ins, and organize unlimited events — no credit card required.",
-  keywords: ["digital waivers", "electronic signatures", "event management", "liability waivers", "waiver signing", "event check-in", "free waiver platform", "volunteer management"],
+  description: "Volntir is free volunteer management software for nonprofits and events. Shift signups, digital waivers, check-ins, and hour tracking — all in one place. No credit card. No trial period. Always free.",
+  keywords: ["volunteer management software", "free volunteer management", "nonprofit volunteer software", "volunteer shift signup", "digital waiver software", "volunteer hour tracking", "free SignUpGenius alternative", "event volunteer management", "volunteer check in app", "nonprofit event management"],
   authors: [{ name: "Volntir" }],
   creator: "Volntir",
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://volntir.com"),
@@ -31,14 +31,14 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: "Volntir",
-    title: "Volntir - Free Digital Waiver Management for Events",
-    description: "Collect digital liability waivers, manage event check-ins, and organize unlimited events — completely free.",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Volntir - Free Digital Waiver Management for Events" }],
+    title: "Free Volunteer Management Software for Nonprofits & Events | Volntir",
+    description: "Free volunteer management software for nonprofits and events — shift signups, digital waivers, check-ins, and hour tracking. No credit card required.",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Free Volunteer Management Software for Nonprofits & Events | Volntir" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Volntir - Free Digital Waiver Management",
-    description: "Collect digital liability waivers, manage event check-ins, and organize unlimited events — completely free.",
+    title: "Free Volunteer Management Software for Nonprofits | Volntir",
+    description: "Free volunteer management for nonprofits — shift signups, digital waivers, check-ins, and hour tracking. No credit card.",
     images: ["/opengraph-image"],
   },
   robots: {
