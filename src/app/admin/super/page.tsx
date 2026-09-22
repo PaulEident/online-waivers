@@ -1,4 +1,5 @@
 import { requireRole, getOrganizations, getUsers, getSubmissionCounts } from "@/lib/actions";
+import { getWaiverCount } from "@/lib/report-actions";
 import Link from "next/link";
 import MailchimpToggle from "@/components/MailchimpToggle";
 
@@ -9,6 +10,7 @@ export default async function SuperAdminPage() {
   const orgs = await getOrganizations();
   const users = await getUsers();
   const submissions = await getSubmissionCounts();
+  const waiverCount = await getWaiverCount();
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -37,9 +39,7 @@ export default async function SuperAdminPage() {
             <div className="text-sm text-gray-500">Events</div>
           </div>
           <div className="bg-white rounded-lg shadow p-4 text-center">
-            <div className="text-3xl font-bold text-gray-900">
-              {users.reduce((acc, u) => acc + u._count.waivers, 0)}
-            </div>
+            <div className="text-3xl font-bold text-gray-900">{waiverCount}</div>
             <div className="text-sm text-gray-500">Waivers</div>
           </div>
         </div>
@@ -51,6 +51,12 @@ export default async function SuperAdminPage() {
             className="px-4 py-2 bg-brand text-white text-sm font-medium rounded-lg hover:bg-brand-hover transition-colors"
           >
             + New Organization
+          </Link>
+          <Link
+            href="/admin/super/reports"
+            className="px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded-lg shadow hover:bg-gray-50 transition-colors"
+          >
+            Reports
           </Link>
           <Link
             href="/admin/super/organizations"
